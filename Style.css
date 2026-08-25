@@ -682,10 +682,10 @@ section[id] {
   color: var(--pink);
 }
 .carousel__nav--prev {
-  left: -20px;
+  left: 10px;
 }
 .carousel__nav--next {
-  right: -20px;
+  right: 10px;
 }
 @media (max-width: 768px) {
   .carousel__nav {
@@ -761,8 +761,7 @@ section[id] {
   margin: 0;
   color: var(--muted);
   font-size: 0.98rem;
-  text-align: justify;
-  text-justify: inter-word;
+  text-align: left;
 }
 .card--image {
   padding: 0;
