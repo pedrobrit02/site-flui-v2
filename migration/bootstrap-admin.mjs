@@ -9,6 +9,11 @@
 //
 // Isso imprime um comando "npx wrangler@3 d1 execute ..." pronto pra rodar.
 
+// Node 18 não expõe "crypto" como global automaticamente (só a partir do
+// Node 19+). Isso garante que o script funcione em qualquer versão do Node.
+import { webcrypto, randomUUID as nodeRandomUUID } from "node:crypto";
+if (!globalThis.crypto) globalThis.crypto = webcrypto;
+
 import { hashPassword } from "../worker/src/auth.js";
 
 const [, , name, email, password] = process.argv;
@@ -23,7 +28,7 @@ if (password.length < 8) {
   process.exit(1);
 }
 
-const id = crypto.randomUUID();
+const id = (globalThis.crypto && globalThis.crypto.randomUUID) ? globalThis.crypto.randomUUID() : nodeRandomUUID();
 const hash = await hashPassword(password);
 const emailLower = email.toLowerCase().replace(/'/g, "''");
 const nameEscaped = name.replace(/'/g, "''");
