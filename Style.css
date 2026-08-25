@@ -1358,9 +1358,13 @@ input[type="file"]::file-selector-button:hover {
 }
 .termo-instrucoes {
   margin: 0 0 4px;
+  padding-left: 20px;
   font-size: 0.85rem;
   color: var(--muted);
   line-height: 1.5;
+}
+.termo-instrucoes li {
+  margin-bottom: 2px;
 }
 @media print {
   body * {
