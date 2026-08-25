@@ -1357,8 +1357,22 @@ input[type="file"]::file-selector-button:hover {
   overflow-y: auto;
 }
 .actions--between {
-  justify-content: flex-start;
   margin: 0 0 14px;
+}
+.loan-card .actions--between,
+.use-card .actions--between {
+  justify-content: flex-start;
+}
+.btn--brand {
+  background: rgba(122, 44, 255, 0.08);
+  border-color: rgba(122, 44, 255, 0.35);
+  color: var(--purple);
+}
+.btn--brand:hover {
+  background: rgba(122, 44, 255, 0.14);
+  border-color: rgba(122, 44, 255, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 18px 50px rgba(10, 10, 20, 0.1);
 }
 .termo-instrucoes {
   margin: 0 0 4px;
