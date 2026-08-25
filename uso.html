@@ -153,6 +153,14 @@
       }
 
       const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjD1CqT0BNYEd3bCdCk3xIBfTHbjJW2WDlMEFbAcIaJnAJb_ZccqLBLwGCJ2eONwQMsw/exec";
+      const WORKER_URL = "https://flui-api.pedro-brito-flui.workers.dev";
+
+      // Contagem de acessos p/ o painel administrativo (não bloqueia a página).
+      fetch(`${WORKER_URL}/api/pageview`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: "uso" }),
+      }).catch(() => {});
       const form = document.getElementById("form");
       const btnEnviar = document.getElementById("btnEnviar");
       const limpar = document.getElementById("limpar");
@@ -306,9 +314,10 @@ Assinatura eletrônica do(a) responsável: ${nome}`;
         btnEnviar.textContent = "Enviando...";
 
         try {
-          const equipamentosSelecionados = Array.from(
+          const equipamentosArray = Array.from(
             document.querySelectorAll('input[name="equipamento"]:checked')
-          ).map((item) => item.value).join(", ");
+          ).map((item) => item.value);
+          const equipamentosSelecionados = equipamentosArray.join(", ");
 
           if (!equipamentosSelecionados) throw new Error("Selecione ao menos um equipamento.");
 
@@ -345,6 +354,19 @@ Assinatura eletrônica do(a) responsável: ${nome}`;
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
           });
+
+          // Também salva no banco (Cloudflare D1), que é o que alimenta o
+          // painel administrativo. Se isso falhar, a solicitação já foi
+          // registrada na planilha acima — não bloqueia o envio.
+          try {
+            await fetch(`${WORKER_URL}/api/uso`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ...payload, equipamentos: equipamentosArray })
+            });
+          } catch (dbErr) {
+            console.error("Não foi possível salvar no painel administrativo:", dbErr);
+          }
 
           msg.style.color = "green";
           msg.textContent = "Solicitação realizada com sucesso!";

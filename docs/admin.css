@@ -1,0 +1,391 @@
+/* Estilos do painel administrativo — reaproveita as variáveis de cor e
+   fontes definidas em Style.css (--purple, --pink, --blue, --ink, etc.). */
+
+.admin-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(160deg, rgba(255, 46, 166, 0.08), rgba(122, 44, 255, 0.06) 45%, rgba(43, 123, 255, 0.06));
+  padding: 24px;
+}
+.admin-login__card {
+  width: 100%;
+  max-width: 380px;
+  background: #fff;
+  border-radius: var(--radius);
+  border: 1px solid rgba(12, 12, 16, 0.1);
+  box-shadow: var(--shadow);
+  padding: 32px 28px;
+}
+.admin-login__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.admin-login h1 {
+  margin: 0 0 4px;
+  font-size: 1.3rem;
+}
+.admin-login__subtitle {
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.admin-login form label {
+  display: block;
+  font-weight: 650;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+.admin-login form input {
+  width: 100%;
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(12, 12, 16, 0.14);
+  font: inherit;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--ink);
+}
+.admin-login form input:focus-visible {
+  outline: none;
+  border-color: rgba(122, 44, 255, 0.45);
+  box-shadow: var(--focus), 0 12px 28px rgba(122, 44, 255, 0.14);
+}
+.admin-login__submit {
+  width: 100%;
+  margin-top: 4px;
+}
+.admin-login__back {
+  display: block;
+  text-align: center;
+  margin-top: 18px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-decoration: none;
+}
+.admin-login__back:hover {
+  color: var(--purple);
+}
+.msg--error {
+  color: #c0392b;
+  background: rgba(192, 57, 43, 0.08);
+  border: 1px solid rgba(192, 57, 43, 0.25);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  margin-bottom: 14px;
+}
+
+/* --- Dashboard --- */
+.admin-shell {
+  min-height: 100vh;
+  background: #fafaff;
+}
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 24px;
+  background: #fff;
+  border-bottom: 1px solid rgba(12, 12, 16, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.admin-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+.admin-header__user {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.admin-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+.admin-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid rgba(12, 12, 16, 0.1);
+  padding-bottom: 8px;
+}
+.admin-tab {
+  border: none;
+  background: transparent;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-weight: 650;
+  font-size: 0.9rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+.admin-tab:hover {
+  background: rgba(122, 44, 255, 0.08);
+  color: var(--ink);
+}
+.admin-tab.is-active {
+  background: var(--purple);
+  color: #fff;
+}
+.admin-panel {
+  display: none;
+}
+.admin-panel.is-active {
+  display: block;
+}
+.admin-panel__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.admin-filter {
+  display: flex;
+  gap: 6px;
+}
+.admin-filter button {
+  border: 1px solid rgba(12, 12, 16, 0.14);
+  background: #fff;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  color: var(--ink);
+}
+.admin-filter button.is-active {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  border: 1px solid rgba(12, 12, 16, 0.1);
+  border-radius: var(--radius);
+  background: #fff;
+}
+table.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.admin-table th,
+.admin-table td {
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(12, 12, 16, 0.08);
+  vertical-align: top;
+}
+.admin-table th {
+  background: rgba(122, 44, 255, 0.05);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+.badge--pendente {
+  background: rgba(43, 123, 255, 0.12);
+  color: #1a5fcc;
+}
+.badge--deferido {
+  background: rgba(26, 156, 92, 0.12);
+  color: #1a9c5c;
+}
+.badge--indeferido {
+  background: rgba(192, 57, 43, 0.12);
+  color: #c0392b;
+}
+.admin-row-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.admin-row-actions button,
+.admin-row-actions a {
+  border: 1px solid rgba(12, 12, 16, 0.14);
+  background: #fff;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--ink);
+}
+.admin-row-actions .aprovar {
+  border-color: rgba(26, 156, 92, 0.4);
+  color: #1a9c5c;
+}
+.admin-row-actions .aprovar:hover {
+  background: rgba(26, 156, 92, 0.1);
+}
+.admin-row-actions .reprovar {
+  border-color: rgba(192, 57, 43, 0.4);
+  color: #c0392b;
+}
+.admin-row-actions .reprovar:hover {
+  background: rgba(192, 57, 43, 0.1);
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.stat-tile {
+  background: #fff;
+  border: 1px solid rgba(12, 12, 16, 0.1);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+.stat-tile__value {
+  font-size: 1.7rem;
+  font-weight: 750;
+  line-height: 1.1;
+}
+.stat-tile__label {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin-top: 4px;
+}
+
+.chart-card {
+  background: #fff;
+  border: 1px solid rgba(12, 12, 16, 0.1);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-bottom: 20px;
+}
+.chart-card h3 {
+  margin: 0 0 16px;
+  font-size: 1rem;
+}
+.bar-row {
+  display: grid;
+  grid-template-columns: 160px 1fr 40px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+}
+.bar-row__label {
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bar-row__track {
+  background: rgba(12, 12, 16, 0.06);
+  border-radius: 999px;
+  height: 12px;
+  overflow: hidden;
+}
+.bar-row__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--grad);
+}
+.bar-row__value {
+  text-align: right;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.empty-state {
+  color: var(--muted);
+  font-size: 0.9rem;
+  padding: 24px;
+  text-align: center;
+}
+
+.admin-form-inline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  align-items: end;
+  background: #fff;
+  border: 1px solid rgba(12, 12, 16, 0.1);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+.admin-form-inline label {
+  display: block;
+  font-weight: 650;
+  font-size: 0.82rem;
+  margin-bottom: 6px;
+}
+.admin-form-inline input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(12, 12, 16, 0.14);
+  font: inherit;
+}
+
+/* --- Diálogo de decisão (deferir/indeferir) --- */
+#decisaoDialog {
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  width: 100%;
+  max-width: 420px;
+}
+#decisaoDialog::backdrop {
+  background: rgba(12, 12, 16, 0.45);
+}
+#decisaoDialog h3 {
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+}
+#decisaoDialog label {
+  display: block;
+  font-weight: 650;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+#decisaoDialog textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(12, 12, 16, 0.14);
+  font: inherit;
+  resize: vertical;
+  margin-bottom: 16px;
+}
+#decisaoDialog .actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.admin-row-actions button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}

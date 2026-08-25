@@ -334,5 +334,13 @@
         window.initCarousel = initCarousel;
     </script>
 
+    <script>
+      // Contagem de acessos p/ o painel administrativo (não bloqueia a página).
+      fetch("https://flui-api.pedro-brito-flui.workers.dev/api/pageview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: "index" }),
+      }).catch(() => {});
+    </script>
   </body>
 </html>

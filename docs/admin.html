@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>FLUI — Painel Administrativo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="Style.css" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <div class="admin-shell">
+      <header class="admin-header">
+        <div class="admin-header__brand">
+          <span class="brand__symbol" aria-hidden="true"></span>
+          <span>FLUI — Painel Administrativo</span>
+        </div>
+        <div class="admin-header__user">
+          <span id="adminNome"></span>
+          <button type="button" class="btn btn--ghost" id="btnSair">Sair</button>
+        </div>
+      </header>
+
+      <main class="admin-main">
+        <nav class="admin-tabs">
+          <button type="button" class="admin-tab is-active" data-tab="uso">Solicitações de Uso</button>
+          <button type="button" class="admin-tab" data-tab="emprestimo">Solicitações de Empréstimo</button>
+          <button type="button" class="admin-tab" data-tab="relatorios">Relatórios</button>
+          <button type="button" class="admin-tab" data-tab="acessos">Acessos</button>
+          <button type="button" class="admin-tab" data-tab="admins">Administradores</button>
+        </nav>
+
+        <!-- USO -->
+        <section class="admin-panel is-active" id="panel-uso">
+          <div class="admin-panel__toolbar">
+            <div class="admin-filter" data-filter-for="uso">
+              <button type="button" class="is-active" data-status="">Todas</button>
+              <button type="button" data-status="pendente">Pendentes</button>
+              <button type="button" data-status="deferido">Deferidas</button>
+              <button type="button" data-status="indeferido">Indeferidas</button>
+            </div>
+            <a class="btn btn--ghost" id="exportUso" href="#" target="_blank" rel="noopener">Exportar CSV</a>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Contato</th>
+                  <th>Equipamentos</th>
+                  <th>Início</th>
+                  <th>Finalidade</th>
+                  <th>Status</th>
+                  <th>Termo</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaUso"></tbody>
+            </table>
+            <div class="empty-state" id="usoVazio" style="display: none">Nenhuma solicitação encontrada.</div>
+          </div>
+        </section>
+
+        <!-- EMPRÉSTIMO -->
+        <section class="admin-panel" id="panel-emprestimo">
+          <div class="admin-panel__toolbar">
+            <div class="admin-filter" data-filter-for="emprestimo">
+              <button type="button" class="is-active" data-status="">Todas</button>
+              <button type="button" data-status="pendente">Pendentes</button>
+              <button type="button" data-status="deferido">Deferidas</button>
+              <button type="button" data-status="indeferido">Indeferidas</button>
+            </div>
+            <a class="btn btn--ghost" id="exportEmprestimo" href="#" target="_blank" rel="noopener">Exportar CSV</a>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Contato</th>
+                  <th>Materiais</th>
+                  <th>Retirada</th>
+                  <th>Finalidade</th>
+                  <th>Status</th>
+                  <th>Termo</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaEmprestimo"></tbody>
+            </table>
+            <div class="empty-state" id="emprestimoVazio" style="display: none">Nenhuma solicitação encontrada.</div>
+          </div>
+        </section>
+
+        <!-- RELATÓRIOS -->
+        <section class="admin-panel" id="panel-relatorios">
+          <div class="stat-grid" id="statGrid"></div>
+          <div class="chart-card">
+            <h3>Equipamentos mais usados (Uso)</h3>
+            <div id="chartEquipamentos"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Materiais mais emprestados (Empréstimo)</h3>
+            <div id="chartMateriais"></div>
+          </div>
+        </section>
+
+        <!-- ACESSOS -->
+        <section class="admin-panel" id="panel-acessos">
+          <div class="stat-grid" id="pageviewGrid"></div>
+          <div class="chart-card">
+            <h3>Acessos por página (últimos 30 dias)</h3>
+            <div id="chartPaginas"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Acessos por dia (últimos 30 dias)</h3>
+            <div id="chartDias"></div>
+          </div>
+        </section>
+
+        <!-- ADMINISTRADORES -->
+        <section class="admin-panel" id="panel-admins">
+          <form class="admin-form-inline" id="formNovoAdmin">
+            <div>
+              <label for="novoNome">Nome</label>
+              <input type="text" id="novoNome" required />
+            </div>
+            <div>
+              <label for="novoEmail">E-mail</label>
+              <input type="email" id="novoEmail" required />
+            </div>
+            <div>
+              <label for="novaSenha">Senha (mín. 8 caracteres)</label>
+              <input type="password" id="novaSenha" minlength="8" required />
+            </div>
+            <button type="submit" class="btn btn--primary">Adicionar administrador</button>
+          </form>
+          <div class="msg msg--error" id="adminMsg" style="display: none"></div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>E-mail</th>
+                  <th>Criado em</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaAdmins"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="decisaoDialog">
+      <form method="dialog" id="decisaoForm">
+        <h3 id="decisaoTitulo">Confirmar decisão</h3>
+        <label for="decisaoMotivo">Observação para o e-mail (opcional)</label>
+        <textarea id="decisaoMotivo" rows="3"></textarea>
+        <div class="actions">
+          <button type="button" class="btn btn--ghost" id="decisaoCancelar">Cancelar</button>
+          <button type="submit" class="btn btn--primary" id="decisaoConfirmar">Confirmar</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script>
+      const WORKER_URL = "https://flui-api.pedro-brito-flui.workers.dev";
+      const fetchOpts = (opts = {}) => ({ credentials: "include", ...opts });
+
+      // --- Autenticação ---
+      async function checarSessao() {
+        const res = await fetch(`${WORKER_URL}/api/admin/me`, fetchOpts());
+        if (!res.ok) {
+          window.location.href = "./admin-login.html";
+          return null;
+        }
+        const data = await res.json();
+        document.getElementById("adminNome").textContent = data.admin.name;
+        return data.admin;
+      }
+
+      document.getElementById("btnSair").addEventListener("click", async () => {
+        await fetch(`${WORKER_URL}/api/admin/logout`, fetchOpts({ method: "POST" }));
+        window.location.href = "./admin-login.html";
+      });
+
+      // --- Abas ---
+      const tabs = document.querySelectorAll(".admin-tab");
+      const panels = document.querySelectorAll(".admin-panel");
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          tabs.forEach((t) => t.classList.remove("is-active"));
+          panels.forEach((p) => p.classList.remove("is-active"));
+          tab.classList.add("is-active");
+          document.getElementById(`panel-${tab.dataset.tab}`).classList.add("is-active");
+          carregarAbaSeNecessario(tab.dataset.tab);
+        });
+      });
+
+      const abasCarregadas = new Set();
+      function carregarAbaSeNecessario(aba) {
+        if (abasCarregadas.has(aba)) return;
+        abasCarregadas.add(aba);
+        if (aba === "relatorios") carregarRelatorios();
+        if (aba === "acessos") carregarAcessos();
+        if (aba === "admins") carregarAdmins();
+      }
+
+      // --- Solicitações (Uso / Empréstimo) ---
+      const ROTULOS_STATUS = { pendente: "Pendente", deferido: "Deferido", indeferido: "Indeferido" };
+
+      function badge(status) {
+        return `<span class="badge badge--${status}">${ROTULOS_STATUS[status] || status}</span>`;
+      }
+
+      function formatarDataHora(iso) {
+        if (!iso) return "—";
+        const d = new Date(iso.replace(" ", "T") + (iso.includes("Z") ? "" : "Z"));
+        if (Number.isNaN(d.getTime())) return iso;
+        return d.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+      }
+
+      async function carregarSolicitacoes(tipo, status) {
+        const qs = status ? `?tipo=${tipo}&status=${status}` : `?tipo=${tipo}`;
+        const res = await fetch(`${WORKER_URL}/api/admin/solicitacoes${qs}`, fetchOpts());
+        if (!res.ok) return;
+        const data = await res.json();
+        renderizarTabela(tipo, data.solicitacoes);
+      }
+
+      function renderizarTabela(tipo, linhas) {
+        const corpo = document.getElementById(tipo === "uso" ? "tabelaUso" : "tabelaEmprestimo");
+        const vazio = document.getElementById(tipo === "uso" ? "usoVazio" : "emprestimoVazio");
+        corpo.innerHTML = "";
+        vazio.style.display = linhas.length ? "none" : "block";
+
+        linhas.forEach((item) => {
+          const itens = tipo === "uso" ? item.equipamentos : item.materiais;
+          const itensTexto = (itens || [])
+            .map((it) => (typeof it === "string" ? it : `${it.nome} (${it.quantidade || 1})`))
+            .join(", ");
+          const dataPrincipal = tipo === "uso" ? item.inicio : item.data_retirada;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${escapeHtml(item.nome)}${item.matricula_id ? `<br><small>${escapeHtml(item.matricula_id)}</small>` : ""}</td>
+            <td>${escapeHtml(item.email)}${item.telefone ? `<br><small>${escapeHtml(item.telefone)}</small>` : ""}</td>
+            <td>${escapeHtml(itensTexto)}</td>
+            <td>${formatarDataHora(dataPrincipal)}</td>
+            <td>${escapeHtml(item.finalidade || "")}</td>
+            <td>${badge(item.status)}</td>
+            <td>${
+              item.tem_termo
+                ? `<a href="${WORKER_URL}/api/admin/solicitacoes/${tipo}/${item.id}/termo" target="_blank" rel="noopener">Baixar</a>`
+                : "—"
+            }</td>
+            <td>
+              <div class="admin-row-actions">
+                <button type="button" class="aprovar" data-acao="deferido" data-id="${item.id}" data-tipo="${tipo}" data-nome="${escapeHtml(item.nome)}" ${item.status === "deferido" ? "disabled" : ""}>Deferir</button>
+                <button type="button" class="reprovar" data-acao="indeferido" data-id="${item.id}" data-tipo="${tipo}" data-nome="${escapeHtml(item.nome)}" ${item.status === "indeferido" ? "disabled" : ""}>Indeferir</button>
+              </div>
+            </td>
+          `;
+          corpo.appendChild(tr);
+        });
+
+        corpo.querySelectorAll("button[data-acao]").forEach((btn) => {
+          btn.addEventListener("click", () => abrirDialogoDecisao(btn.dataset.tipo, btn.dataset.id, btn.dataset.acao, btn.dataset.nome));
+        });
+      }
+
+      function escapeHtml(str) {
+        return String(str || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      // --- Diálogo de decisão (deferir/indeferir) ---
+      const dialog = document.getElementById("decisaoDialog");
+      let decisaoAtual = null;
+
+      function abrirDialogoDecisao(tipo, id, status, nome) {
+        decisaoAtual = { tipo, id, status };
+        document.getElementById("decisaoTitulo").textContent =
+          status === "deferido" ? `Deferir solicitação de ${nome}?` : `Indeferir solicitação de ${nome}?`;
+        document.getElementById("decisaoMotivo").value = "";
+        dialog.showModal();
+      }
+
+      document.getElementById("decisaoCancelar").addEventListener("click", () => dialog.close());
+
+      document.getElementById("decisaoForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!decisaoAtual) return;
+        const { tipo, id, status } = decisaoAtual;
+        const motivo = document.getElementById("decisaoMotivo").value.trim();
+
+        const btnConfirmar = document.getElementById("decisaoConfirmar");
+        btnConfirmar.disabled = true;
+        try {
+          const res = await fetch(`${WORKER_URL}/api/admin/solicitacoes/${tipo}/${id}/decidir`, fetchOpts({
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status, motivo: motivo || undefined }),
+          }));
+          if (res.ok) {
+            dialog.close();
+            const statusAtivo = document.querySelector(`.admin-filter[data-filter-for="${tipo}"] button.is-active`);
+            carregarSolicitacoes(tipo, statusAtivo ? statusAtivo.dataset.status : "");
+          }
+        } finally {
+          btnConfirmar.disabled = false;
+        }
+      });
+
+      // --- Filtros ---
+      document.querySelectorAll(".admin-filter").forEach((grupo) => {
+        const tipo = grupo.dataset.filterFor;
+        grupo.querySelectorAll("button").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            grupo.querySelectorAll("button").forEach((b) => b.classList.remove("is-active"));
+            btn.classList.add("is-active");
+            carregarSolicitacoes(tipo, btn.dataset.status);
+          });
+        });
+      });
+
+      // --- Exportação CSV ---
+      document.getElementById("exportUso").href = `${WORKER_URL}/api/admin/export.csv?tipo=uso`;
+      document.getElementById("exportEmprestimo").href = `${WORKER_URL}/api/admin/export.csv?tipo=emprestimo`;
+
+      // --- Relatórios (gráficos de barra simples) ---
+      function renderizarBarras(containerId, itens, chaveLabel, chaveValor) {
+        const container = document.getElementById(containerId);
+        if (!itens || !itens.length) {
+          container.innerHTML = '<p class="empty-state">Ainda não há dados suficientes.</p>';
+          return;
+        }
+        const max = Math.max(...itens.map((i) => i[chaveValor]));
+        container.innerHTML = itens
+          .slice(0, 10)
+          .map(
+            (i) => `
+            <div class="bar-row">
+              <div class="bar-row__label" title="${escapeHtml(i[chaveLabel])}">${escapeHtml(i[chaveLabel])}</div>
+              <div class="bar-row__track"><div class="bar-row__fill" style="width:${(i[chaveValor] / max) * 100}%"></div></div>
+              <div class="bar-row__value">${i[chaveValor]}</div>
+            </div>`
+          )
+          .join("");
+      }
+
+      function statTile(valor, rotulo) {
+        return `<div class="stat-tile"><div class="stat-tile__value">${valor}</div><div class="stat-tile__label">${rotulo}</div></div>`;
+      }
+
+      async function carregarRelatorios() {
+        const res = await fetch(`${WORKER_URL}/api/admin/stats`, fetchOpts());
+        if (!res.ok) return;
+        const data = await res.json();
+
+        document.getElementById("statGrid").innerHTML = [
+          statTile(data.uso.total, "Solicitações de uso"),
+          statTile(data.uso.por_status.pendente, "Uso — pendentes"),
+          statTile(data.emprestimo.total, "Solicitações de empréstimo"),
+          statTile(data.emprestimo.por_status.pendente, "Empréstimo — pendentes"),
+        ].join("");
+
+        renderizarBarras("chartEquipamentos", data.uso.equipamentos_mais_usados, "nome", "total");
+        renderizarBarras("chartMateriais", data.emprestimo.materiais_mais_emprestados, "nome", "total");
+      }
+
+      // --- Acessos ---
+      async function carregarAcessos() {
+        const res = await fetch(`${WORKER_URL}/api/admin/pageviews?dias=30`, fetchOpts());
+        if (!res.ok) return;
+        const data = await res.json();
+
+        const rotulosPagina = { index: "Página inicial", uso: "Uso de equipamentos", emprestimo: "Empréstimo", outro: "Outras" };
+        const porPaginaFmt = data.por_pagina.map((p) => ({ nome: rotulosPagina[p.path] || p.path, total: p.total }));
+
+        document.getElementById("pageviewGrid").innerHTML = [
+          statTile(data.total, "Acessos (30 dias)"),
+          ...data.por_pagina.map((p) => statTile(p.total, rotulosPagina[p.path] || p.path)),
+        ].join("");
+
+        renderizarBarras("chartPaginas", porPaginaFmt, "nome", "total");
+
+        const porDiaFmt = data.por_dia.map((d) => ({
+          nome: new Date(d.dia + "T00:00:00Z").toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
+          total: d.total,
+        }));
+        renderizarBarras("chartDias", porDiaFmt, "nome", "total");
+      }
+
+      // --- Administradores ---
+      async function carregarAdmins() {
+        const res = await fetch(`${WORKER_URL}/api/admin/admins`, fetchOpts());
+        if (!res.ok) return;
+        const data = await res.json();
+        document.getElementById("tabelaAdmins").innerHTML = data.admins
+          .map(
+            (a) => `<tr><td>${escapeHtml(a.name)}</td><td>${escapeHtml(a.email)}</td><td>${formatarDataHora(a.created_at)}</td></tr>`
+          )
+          .join("");
+      }
+
+      document.getElementById("formNovoAdmin").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const msg = document.getElementById("adminMsg");
+        msg.style.display = "none";
+        try {
+          const res = await fetch(`${WORKER_URL}/api/admin/admins`, fetchOpts({
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: document.getElementById("novoNome").value.trim(),
+              email: document.getElementById("novoEmail").value.trim(),
+              password: document.getElementById("novaSenha").value,
+            }),
+          }));
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            msg.textContent = data.error || "Não foi possível adicionar.";
+            msg.style.display = "block";
+            return;
+          }
+          e.target.reset();
+          carregarAdmins();
+        } catch (err) {
+          msg.textContent = "Erro de conexão.";
+          msg.style.display = "block";
+        }
+      });
+
+      // --- Inicialização ---
+      (async () => {
+        const admin = await checarSessao();
+        if (!admin) return;
+        carregarSolicitacoes("uso", "");
+        carregarSolicitacoes("emprestimo", "");
+      })();
+    </script>
+  </body>
+</html>

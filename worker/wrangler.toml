@@ -10,3 +10,12 @@ database_id = "76bf5c74-b4e2-4f95-a476-acf0088c4c1b"
 [[r2_buckets]]
 binding = "ASSETS_BUCKET"            # nome usado no código como env.ASSETS_BUCKET
 bucket_name = "flui-assets"
+
+[[r2_buckets]]
+binding = "UPLOADS_BUCKET"           # nome usado no código como env.UPLOADS_BUCKET
+bucket_name = "flui-uploads"         # bucket PRIVADO (termos assinados) — sem rota pública
+
+# Secrets (não vão aqui, são configurados com "wrangler secret put"):
+#   SESSION_SECRET  — string aleatória p/ assinar o login do admin
+#   RESEND_API_KEY  — chave da API do Resend p/ enviar e-mail de decisão
+#   RESEND_FROM     — remetente do e-mail, ex: "FLUI <no-reply@seudominio.com>"

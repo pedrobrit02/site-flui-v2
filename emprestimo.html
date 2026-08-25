@@ -125,6 +125,14 @@
       }
 
       const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzesiNEP0jY6PN9odz8F6mrGqQjsEmRR4jgh95hPtEHN7qFL-Qi46vIK_9I2MWe3I1nyg/exec";
+      const WORKER_URL = "https://flui-api.pedro-brito-flui.workers.dev";
+
+      // Contagem de acessos p/ o painel administrativo (não bloqueia a página).
+      fetch(`${WORKER_URL}/api/pageview`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: "emprestimo" }),
+      }).catch(() => {});
 
       const itens = [
         ["Cabo USB", 26], ["Adaptador", 3], ["protobord Mb 102", 16], ["protobord menor 400 pontos", 23],
@@ -189,6 +197,15 @@
         document.querySelectorAll(".item:checked").forEach((cb) => {
           const qtd = cb.closest(".item-row").querySelector('input[type="number"]').value;
           lista.push(`${cb.dataset.item} (${qtd})`);
+        });
+        return lista;
+      }
+
+      function coletarItensEstruturados() {
+        const lista = [];
+        document.querySelectorAll(".item:checked").forEach((cb) => {
+          const qtd = parseInt(cb.closest(".item-row").querySelector('input[type="number"]').value, 10) || 1;
+          lista.push({ nome: cb.dataset.item, quantidade: qtd });
         });
         return lista;
       }
@@ -397,6 +414,32 @@ Assinatura eletrônica do(a) responsável: ${nome}`;
             mode: "no-cors",
             body: JSON.stringify(payload)
           });
+
+          // Também salva no banco (Cloudflare D1), que é o que alimenta o
+          // painel administrativo. Se isso falhar, a solicitação já foi
+          // registrada na planilha acima — não bloqueia o envio.
+          try {
+            await fetch(`${WORKER_URL}/api/emprestimo`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                nome: payload.nome,
+                matricula_id: payload.matricula_id,
+                email: payload.email,
+                telefone: payload.telefone,
+                setor: payload.setor,
+                materiais: coletarItensEstruturados(),
+                data_retirada: payload.retirada,
+                data_devolucao: payload.devolucao,
+                finalidade: payload.finalidade,
+                observacoes: payload.observacoes,
+                file: base64,
+                fileName: file.name
+              })
+            });
+          } catch (dbErr) {
+            console.error("Não foi possível salvar no painel administrativo:", dbErr);
+          }
 
           msg.textContent = "Solicitação enviada com sucesso!";
           msg.style.color = "green";

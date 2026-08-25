@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>FLUI — Painel Administrativo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="Style.css" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <main class="admin-login">
+      <div class="admin-login__card">
+        <div class="brand admin-login__brand" aria-hidden="true">
+          <span class="brand__symbol"></span>
+          <span class="brand__text">FLUI</span>
+        </div>
+        <h1>Painel Administrativo</h1>
+        <p class="admin-login__subtitle">Acesso restrito à equipe do FLUI.</p>
+
+        <form id="loginForm">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" required autocomplete="username" />
+
+          <label for="password">Senha</label>
+          <input type="password" id="password" required autocomplete="current-password" />
+
+          <div class="msg msg--error" id="msg" style="display: none"></div>
+
+          <button type="submit" class="btn btn--primary admin-login__submit" id="btnEntrar">Entrar</button>
+        </form>
+
+        <a class="admin-login__back" href="./index.html">← Voltar para o site</a>
+      </div>
+    </main>
+
+    <script>
+      const WORKER_URL = "https://flui-api.pedro-brito-flui.workers.dev";
+      const form = document.getElementById("loginForm");
+      const msg = document.getElementById("msg");
+      const btnEntrar = document.getElementById("btnEntrar");
+
+      function mostrarErro(texto) {
+        msg.textContent = texto;
+        msg.style.display = "block";
+      }
+
+      // Se já tiver sessão válida, pula direto pro painel.
+      (async () => {
+        try {
+          const res = await fetch(`${WORKER_URL}/api/admin/me`, { credentials: "include" });
+          if (res.ok) window.location.href = "./admin.html";
+        } catch (e) {
+          /* segue para o login normalmente */
+        }
+      })();
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        msg.style.display = "none";
+        btnEntrar.disabled = true;
+        btnEntrar.textContent = "Entrando...";
+
+        try {
+          const res = await fetch(`${WORKER_URL}/api/admin/login`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: document.getElementById("email").value.trim(),
+              password: document.getElementById("password").value,
+            }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            mostrarErro(data.error || "Não foi possível entrar.");
+            return;
+          }
+          window.location.href = "./admin.html";
+        } catch (err) {
+          mostrarErro("Erro de conexão. Tente novamente.");
+        } finally {
+          btnEntrar.disabled = false;
+          btnEntrar.textContent = "Entrar";
+        }
+      });
+    </script>
+  </body>
+</html>
