@@ -1339,6 +1339,10 @@ input[type="file"]::file-selector-button:hover {
   color: var(--purple);
 }
 .termo-box {
+  /* O conteúdo do termo é gerado aqui, mas só aparece ao imprimir/baixar em
+     PDF (veja @media print abaixo) — na tela, a pessoa só vê o botão de
+     baixar, não o texto corrido do termo. */
+  display: none;
   border: 1px solid rgba(12, 12, 16, 0.14);
   border-radius: 14px;
   padding: 18px 20px;
@@ -1375,6 +1379,7 @@ input[type="file"]::file-selector-button:hover {
     visibility: visible;
   }
   .termo-box {
+    display: block;
     position: absolute;
     top: 0;
     left: 0;
