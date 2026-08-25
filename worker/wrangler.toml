@@ -1,0 +1,12 @@
+name = "flui-api"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+[[d1_databases]]
+binding = "DB"                       # nome usado no código como env.DB
+database_name = "flui-db"
+database_id = "76bf5c74-b4e2-4f95-a476-acf0088c4c1b"
+
+[[r2_buckets]]
+binding = "ASSETS_BUCKET"            # nome usado no código como env.ASSETS_BUCKET
+bucket_name = "flui-assets"

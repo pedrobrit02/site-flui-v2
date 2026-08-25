@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <title>FLUI — Ambiente de Inovação</title>
+    <meta
+      name="description"
+      content="FLUI — Fab Lab Universitário de Inovação do IFMG Ibirité. Prototipagem rápida e tecnologias para projetos e eventos."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  </head>
+  <script>
+  // Controle do Menu Mobile
+  const toggleBtn = document.querySelector('.nav__toggle');
+  const navMenu = document.querySelector('.nav__menu');
+
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+      toggleBtn.setAttribute('aria-expanded', !expanded);
+      navMenu.classList.toggle('nav__menu--open');
+    });
+  }
+</script>
+
+  <body>
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+    <div id="form-notify" class="formNotify" role="status" aria-live="polite" aria-hidden="true" hidden></div>
+
+    <header class="site-header" id="topo">
+      <nav class="nav" aria-label="Navegação principal">
+        <div class="container nav__inner">
+          <a class="brand" href="#topo" aria-label="Ir para o início">
+            <span class="brand__symbol" aria-hidden="true"></span>
+            <span class="brand__text">FLUI</span>
+          </a>
+
+          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-menu">
+            <span class="sr-only">Abrir menu</span>
+            <span class="nav__toggleLines" aria-hidden="true"></span>
+          </button>
+
+          <div class="nav__menu" id="nav-menu">
+            <a class="nav__link" href="#o-que-e">O que é</a>
+            <a class="nav__link" href="#o-que-oferecemos">O que oferecemos</a>
+            <a class="nav__link" href="#Utilizar-equipamentos">Utilizar os equipamentos</a>
+            <a class="nav__link" href="#eventos">Eventos</a>
+            <a class="nav__link" href="#documentacao-flui">Documentos</a>
+            <a class="nav__link" href="#docentes">Docentes</a>
+            <a class="nav__link" href="#alunos">Bolsistas</a>
+            <a class="nav__cta" href="/uso.html">Uso</a>
+            <a class="nav__cta" href="/emprestimo.html">Empréstimo</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main id="conteudo">
+      <section class="hero" aria-label="Apresentação">
+        <div class="container hero__inner">
+          <div class="hero__copy">
+            <h1 class="hero__title" id="hero-title">FLUI — Ambiente de Inovação</h1>
+            <p id="hero-subtitle" class="hero__subtitle">
+              Um espaço de prototipagem rápida para transformar ideias em protótipos reais e funcionais — com foco em ensino, pesquisa, extensão e eventos.
+            </p>
+            <div class="hero__actions">
+              <a id="hero-cta-conhecer" class="btn btn--primary" href="#o-que-e">Conhecer o FLUI</a>
+              <a id="hero-cta-eventos" class="btn btn--ghost" href="#eventos">Solicitar para eventos</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="o-que-e">
+        <div class="container">
+          <div class="section__head">
+            <h2 id="about-title">O que é o FLUI?</h2>
+            <p id="about-description">
+              O Fab Lab Universitário de Inovação é um laboratório de fabricação digital do IFMG Ibirité. Oferecemos um espaço de inovação onde estudantes e pesquisadores podem transformar ideias teóricas em protótipos reais e funcionais.
+            </p>
+          </div>
+          <hr class="section__divider" aria-hidden="true" />
+          <div id="projects-root"></div>
+        </div>
+      </section>
+
+      <section class="section section--tinted" id="o-que-oferecemos">
+        <div class="container">
+          <div class="section__head">
+            <h2>O que oferecemos?</h2>
+            <p>Nosso foco é a prototipagem rápida, disponibilizando tecnologias de ponta para projetos internos e externos.</p>
+          </div>
+          <div class="carousel">
+            <button type="button" class="carousel__nav carousel__nav--prev" aria-label="Anterior">‹</button>
+            <div class="cards" id="services-carousel-root">
+              <p style="padding: 24px; color: var(--muted);">Carregando tecnologias do laboratório...</p>
+            </div>
+            <button type="button" class="carousel__nav carousel__nav--next" aria-label="Próximo">›</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="Utilizar-equipamentos">
+        <div class="container">
+          <div class="section__head">
+            <h2>Quem pode utilizar os equipamentos e solicitar o empréstimo de materiais?</h2>
+            <p id="who-can-use">
+              Estudantes que estejam desenvolvendo atividades acadêmicas formais, como projeto de extensão, pesquisa, ensino ou eventos.
+            </p>
+            <p id="events-rule">
+              Para agendar o uso dos equipamentos ou solicitar empréstimo de materiais, os formulários estão disponíveis nos botões abaixo.
+            </p>
+            <p class="section__actions">
+              <a class="btn btn--primary" href="/Flui/uso.html">Agendamento para uso de equipamentos</a>
+              <a class="btn btn--primary" href="/Flui/emprestimo.html">Solicitação de empréstimo</a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="eventos">
+        <div class="container">
+          <div class="section__head">
+            <h2>Caso seja para eventos</h2>
+            <p>Sem meio de comprovação pelo SUAP: o professor ou servidor responsável pelo evento deve enviar o pedido formalizado pela solicitação por e-mail.</p>
+          </div>
+
+          <div class="eventContact" role="region" aria-label="Contato para eventos">
+            <p class="eventContact__intro" id="event-contact-text">
+              Os e-mails são enviados para:
+              <a
+                id="event-contact-email"
+                class="eventCard__mailto"
+                href="mailto:flui.ibirite@ifmg.edu.br?subject=Solicitação%20FLUI"
+                aria-label="Enviar e-mail para FLUI"
+              >flui.ibirite@ifmg.edu.br</a>.
+            </p>
+
+            <form class="eventMailForm" id="form-eventos-flui" action="https://formsubmit.co/flui.ibirite@ifmg.edu.br" method="POST">
+              <input type="hidden" name="_captcha" value="false" />
+              <input type="hidden" name="_template" value="table" />
+              <input type="hidden" name="_redirect" value="false" />
+              <input type="hidden" name="_subject" id="eventMailSubject" value="" />
+
+              <div class="eventMailForm__grid">
+                <div class="eventMailForm__field">
+                  <label for="event-nome">Nome:</label>
+                  <input id="event-nome" name="name" type="text" required placeholder="Seu nome" />
+                </div>
+                <div class="eventMailForm__field">
+                  <label for="event-email">E-mail:</label>
+                  <input id="event-email" name="email" type="email" required placeholder="Seu e-mail" />
+                </div>
+                <div class="eventMailForm__field eventMailForm__field--full">
+                  <label for="event-assunto">Assunto:</label>
+                  <input id="event-assunto" name="Assunto" type="text" placeholder="Assunto do pedido" />
+                </div>
+                <div class="eventMailForm__field eventMailForm__field--full">
+                  <label for="event-mensagem">Mensagem:</label>
+                  <textarea id="event-mensagem" name="message" rows="6" required placeholder="Escreva aqui o pedido formalizado..."></textarea>
+                </div>
+              </div>
+
+              <input type="text" name="website" class="eventMailForm__hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+              <div class="eventMailForm__field eventMailForm__field--full">
+                <div class="g-recaptcha" data-sitekey="6LdhL_4sAAAAADtZ3JvXiJXKWsRyitu8va7Akk8X"></div>
+              </div>
+
+              <div class="eventMailForm__actions">
+                <button type="submit" class="btn btn--primary">Enviar para o FLUI</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--tinted" id="documentacao-flui">
+        <div class="container">
+          <div class="section__head">
+            <h2>Documentação do FLUI</h2>
+            <p>Acesse a pasta de documentação do FLUI com manuais, instruções e arquivos de apoio.</p>
+            <p class="section__actions">
+              <a
+                class="btn btn--primary"
+                href="https://drive.google.com/drive/u/4/folders/18FB-_cC25BI02qRgareU-DcGLBiXJVlc"
+                target="_blank"
+                rel="noopener noreferrer"
+              >Abrir documentação no Drive</a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--tinted" id="docentes">
+        <div class="container">
+          <div class="section__head">
+            <h2>Docentes</h2>
+            <p>Equipe de apoio e orientação no uso do espaço.</p>
+            <p class="section__hint">Clique em cada perfil para ver o currículo completo e os destaques de atuação.</p>
+          </div>
+          <div id="docentes-root"></div>
+        </div>
+      </section>
+
+      <section class="section" id="alunos">
+        <div class="container">
+          <div class="section__head">
+            <h2>Bolsistas</h2>
+            <p class="section__hint">Clique em cada perfil para ver o currículo completo e os destaques de atuação.</p>
+          </div>
+          <div id="alunos-root"></div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+        (() => {
+          const toggleBtn = document.querySelector('.nav__toggle');
+          const navMenu = document.querySelector('.nav__menu');
+
+          function toggleMenu() {
+            const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+            toggleBtn.setAttribute('aria-expanded', !isExpanded);
+            navMenu.classList.toggle('nav__menu--open');
+          }
+
+          if (toggleBtn) {
+            toggleBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              toggleMenu();
+            });
+          }
+
+          document.addEventListener('click', (e) => {
+            if (navMenu?.classList.contains('nav__menu--open') && !navMenu.contains(e.target) && e.target !== toggleBtn) {
+              toggleMenu();
+            }
+          });
+
+          const form = document.getElementById("form-eventos-flui");
+          const assuntoInput = document.getElementById("event-assunto");
+          const subjectHidden = document.getElementById("eventMailSubject");
+          const notify = document.getElementById("form-notify");
+
+          const showNotify = (msg, ok = true) => {
+            notify.textContent = msg;
+            notify.hidden = false;
+            notify.style.display = "block";
+            notify.style.color = ok ? "green" : "red";
+            setTimeout(() => { notify.style.display = "none"; notify.hidden = true; }, 5000);
+          };
+          
+          if (form) {
+            form.addEventListener("submit", async (e) => {
+              e.preventDefault();
+              
+              if (window.grecaptcha && grecaptcha.getResponse().length === 0) {
+                showNotify("Por favor, marque a caixa do reCAPTCHA.", false);
+                return;
+              }
+
+              if (form.website.value !== "") return;
+              subjectHidden.value = assuntoInput.value || "Solicitação FLUI";
+              const btn = form.querySelector("button");
+              btn.disabled = true;
+
+              try {
+                  const fd = new FormData(form);
+                  const res = await fetch(form.action, { method: "POST", body: fd });
+                  if (res.ok) {
+                    showNotify("E-mail enviado com sucesso!");
+                    form.reset();
+                    grecaptcha.reset();
+                  } else {
+                    showNotify("Erro ao enviar.", false);
+                  }
+              } catch (err) {
+                  console.error(err);
+                  showNotify("Erro de conexão.", false);
+              } finally {
+                  btn.disabled = false;
+              }
+            });
+          }
+        })();
+
+        function initCarousel() {
+          const carousel = document.querySelector(".cards");
+          const prevButton = document.querySelector(".carousel__nav--prev");
+          const nextButton = document.querySelector(".carousel__nav--next");
+          if (!carousel) return;
+
+          let autoScrollTimer = null;
+          const autoScrollInterval = 3000;
+
+          const scrollAmount = () => {
+            const card = carousel.querySelector("article") || carousel.firstElementChild;
+            if (!card) return carousel.clientWidth;
+            const gap = parseInt(getComputedStyle(carousel).gap) || 14;
+            return card.clientWidth + gap;
+          };
+
+          const scrollTo = (offset) => {
+            const maxScroll = Math.max(carousel.scrollWidth - carousel.clientWidth, 0);
+            const currentLeft = Math.ceil(carousel.scrollLeft);
+            if (currentLeft >= maxScroll - 5 && offset > currentLeft) { carousel.scrollTo({ left: 0, behavior: "smooth" }); return; }
+            if (currentLeft <= 5 && offset < currentLeft) { carousel.scrollTo({ left: maxScroll, behavior: "smooth" }); return; }
+            carousel.scrollTo({ left: offset, behavior: "smooth" });
+          };
+
+          const scrollNext = () => scrollTo(carousel.scrollLeft + scrollAmount());
+          const scrollPrev = () => scrollTo(carousel.scrollLeft - scrollAmount());
+          const startAutoScroll = () => { stopAutoScroll(); autoScrollTimer = setInterval(scrollNext, autoScrollInterval); };
+          const stopAutoScroll = () => { if (autoScrollTimer) clearInterval(autoScrollTimer); };
+
+          if (nextButton) nextButton.onclick = () => { scrollNext(); startAutoScroll(); };
+          if (prevButton) prevButton.onclick = () => { scrollPrev(); startAutoScroll(); };
+          carousel.onmouseenter = stopAutoScroll;
+          carousel.onmouseleave = startAutoScroll;
+          startAutoScroll();
+        }
+        window.initCarousel = initCarousel;
+    </script>
+
+    <script type="module" src="/main.jsx"></script>
+  </body>
+</html>

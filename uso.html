@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <title>FLUI — Agendamento para Uso</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="Style.css" />
+  </head>
+  <body>
+    <header class="site-header" id="topo">
+      <nav class="nav" aria-label="Navegação principal">
+        <div class="container nav__inner">
+
+          <a class="brand" href="./index.html" aria-label="Ir para o início">
+            <span class="brand__symbol" aria-hidden="true"></span>
+            <span class="brand__text">FLUI</span>
+          </a>
+
+          <button
+            class="nav__toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="nav-menu"
+          >
+            <span class="sr-only">Abrir menu</span>
+            <span class="nav__toggleLines" aria-hidden="true">☰</span>
+          </button>
+
+          <div class="nav__menu" id="nav-menu">
+            <a class="nav__link" href="./index.html#o-que-e">O que é</a>
+            <a class="nav__link" href="./index.html#o-que-oferecemos">O que oferecemos</a>
+            <a class="nav__link" href="./index.html#Utilizar-equipamentos">Equipamentos</a>
+            <a class="nav__link" href="./index.html#eventos">Eventos</a>
+            <a class="nav__link" href="./index.html#documentacao-flui">Documentos</a>
+            <a class="nav__link" href="./index.html#docentes">Docentes</a>
+            <a class="nav__link" href="./index.html#alunos">Bolsistas</a>
+            <a class="nav__cta" href="./uso.html">Uso</a>
+            <a class="nav__cta" href="./emprestimo.html">Empréstimo</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="use-page">
+      <div class="container">
+        <div class="use-card">
+          <h1>Agendamento para Uso de Equipamentos</h1>
+
+          <div class="form-note">
+            <strong>Importante:</strong> a operação de todos os equipamentos é feita pela equipe do FLUI.
+            Você não precisa saber operar o maquinário — basta agendar o horário e descrever a finalidade
+            do uso abaixo.
+          </div>
+
+          <div class="draft-note" id="draftNote" style="display: none;"></div>
+
+          <form id="form">
+            <label for="nome">Nome</label>
+            <input type="text" id="nome" required />
+
+            <label for="matricula_id">Matrícula/ID</label>
+            <input type="text" id="matricula_id" required />
+
+            <label for="email">E-mail</label>
+            <input type="email" id="email" required />
+
+            <label for="telefone">Telefone</label>
+            <input type="tel" id="telefone" />
+
+            <label for="setor">Setor/Curso</label>
+            <input type="text" id="setor" />
+
+            <label>Equipamentos</label>
+            <div class="equipamentos">
+              <label class="equipamento-card">
+                <input type="checkbox" name="equipamento" value="Impressora 3D" />
+                <img src="assets/impressora3D.jpeg" alt="Impressora 3D" />
+                <span class="equipamento-title">Impressora 3D</span>
+              </label>
+
+              <label class="equipamento-card">
+                <input type="checkbox" name="equipamento" value="Plotter" />
+                <img src="assets/plotter.jpeg" alt="Plotter" />
+                <span class="equipamento-title">Plotter</span>
+              </label>
+
+              <label class="equipamento-card">
+                <input type="checkbox" name="equipamento" value="Impressora" />
+                <img src="assets/impressora.jpeg" alt="Impressora" />
+                <span class="equipamento-title">Impressora</span>
+              </label>
+
+              <label class="equipamento-card">
+                <input type="checkbox" name="equipamento" value="Corte a Laser" />
+                <img src="assets/cortealaser.jpeg" alt="Corte a Laser" />
+                <span class="equipamento-title">Corte a Laser</span>
+              </label>
+            </div>
+
+            <label for="inicio">Início do uso</label>
+            <input type="datetime-local" id="inicio" required />
+
+            <label for="fim">Término do uso</label>
+            <input type="datetime-local" id="fim" />
+
+            <label for="finalidade">Finalidade</label>
+            <textarea id="finalidade" rows="3" required></textarea>
+
+            <label for="observacoes">Observações</label>
+            <textarea id="observacoes" rows="3"></textarea>
+
+            <label>Termo de Responsabilidade</label>
+            <div class="termo-box" id="termoTexto"></div>
+
+            <p class="termo-instrucoes">
+              1. Baixe o termo acima já preenchido com seus dados. 2. Imprima e assine (ou assine
+              digitalmente). 3. Anexe o arquivo assinado abaixo.
+            </p>
+
+            <div class="actions actions--between">
+              <button type="button" class="btn btn--ghost" id="baixarTermo">Baixar termo em PDF</button>
+            </div>
+
+            <label for="file">Anexar termo de responsabilidade assinado (PDF, máx. 10MB)</label>
+            <input type="file" id="file" accept="application/pdf" required />
+
+            <div class="actions">
+              <button id="limpar" type="button" class="btn btn--ghost">Limpar</button>
+              <button id="btnEnviar" type="submit" class="btn btn--primary">Enviar Solicitação</button>
+            </div>
+            <div class="msg" id="msg"></div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const navToggle = document.querySelector(".nav__toggle");
+      const navMenu = document.querySelector(".nav__menu");
+      if (navToggle) {
+        navToggle.addEventListener("click", () => {
+          const expanded = navToggle.getAttribute('aria-expanded') === 'true';
+          navToggle.setAttribute('aria-expanded', !expanded);
+          navMenu.classList.toggle('nav__menu--open');
+        });
+      }
+
+      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwjD1CqT0BNYEd3bCdCk3xIBfTHbjJW2WDlMEFbAcIaJnAJb_ZccqLBLwGCJ2eONwQMsw/exec";
+      const form = document.getElementById("form");
+      const btnEnviar = document.getElementById("btnEnviar");
+      const limpar = document.getElementById("limpar");
+      const msg = document.getElementById("msg");
+      const draftNote = document.getElementById("draftNote");
+      const termoTexto = document.getElementById("termoTexto");
+      const baixarTermo = document.getElementById("baixarTermo");
+
+      // --- Geração do Termo de Responsabilidade na própria página ---
+      const EQUIPAMENTOS_TERMO = [
+        ["Impressora 3D", "Impressoras 3D"],
+        ["Corte a Laser", "Máquina de Corte a Laser"],
+        ["Plotter", "Plotter"],
+        ["Impressora", "Impressora"]
+      ];
+
+      function formatarData(valor) {
+        if (!valor) return "____/____/______";
+        const data = new Date(valor);
+        if (Number.isNaN(data.getTime())) return "____/____/______";
+        return data.toLocaleDateString("pt-BR");
+      }
+
+      function gerarTextoTermo() {
+        const nome = document.getElementById("nome").value.trim() || "_______________________________";
+        const matricula = document.getElementById("matricula_id").value.trim() || "_______________";
+        const contatoPartes = [document.getElementById("telefone").value.trim(), document.getElementById("email").value.trim()].filter(Boolean);
+        const contato = contatoPartes.length ? contatoPartes.join(" / ") : "_______________";
+        const dataUso = formatarData(document.getElementById("inicio").value);
+        const selecionados = Array.from(document.querySelectorAll('input[name="equipamento"]:checked')).map((el) => el.value);
+        const listaEquipamentos = EQUIPAMENTOS_TERMO
+          .map(([valor, rotulo]) => `${selecionados.includes(valor) ? "☑" : "☐"} ${rotulo}`)
+          .join("\n");
+
+        return `TERMO DE RESPONSABILIDADE – USO DE EQUIPAMENTOS DO FLUI
+
+NORMAS DE UTILIZAÇÃO DOS EQUIPAMENTOS:
+
+• Os equipamentos utilizados são de uso institucional e devem ser utilizados exclusivamente para atividades vinculadas ao IFMG Campus Ibirité;
+• A operação dos equipamentos é realizada exclusivamente pela equipe do FLUI;
+• O(a) responsável pelo uso deve zelar pela boa conservação dos equipamentos e materiais envolvidos;
+• Em caso de perda, extravio, roubo ou dano, o(a) responsável deverá comunicar imediatamente ao FLUI e poderá ser responsabilizado(a);
+• O agendamento é pessoal e intransferível;
+• O(a) responsável deve respeitar o horário agendado.
+
+USO DOS EQUIPAMENTOS
+
+Declaro ter solicitado ao FLUI a utilização dos equipamentos abaixo, cuja operação será realizada pela equipe do FLUI:
+
+${listaEquipamentos}
+
+Responsabilizo-me pelas informações prestadas e me comprometo a notificar qualquer anormalidade, estando ciente das normas estabelecidas acima.
+
+Data prevista para o uso: ${dataUso}
+Nome do(a) responsável: ${nome}
+Matrícula: ${matricula}
+Contato: ${contato}
+
+Assinatura eletrônica do(a) responsável: ${nome}`;
+      }
+
+      function atualizarTermo() {
+        termoTexto.textContent = gerarTextoTermo();
+      }
+
+      // --- Rascunho automático ---
+      // Mantém o preenchimento salvo enquanto a pessoa preenche o formulário,
+      // evitando perda de dados em caso de atualização acidental da página.
+      const DRAFT_KEY = "flui_uso_draft";
+
+      function salvarRascunho() {
+        const dados = {
+          nome: document.getElementById("nome").value,
+          matricula_id: document.getElementById("matricula_id").value,
+          email: document.getElementById("email").value,
+          telefone: document.getElementById("telefone").value,
+          setor: document.getElementById("setor").value,
+          equipamentos: Array.from(document.querySelectorAll('input[name="equipamento"]:checked')).map((el) => el.value),
+          inicio: document.getElementById("inicio").value,
+          fim: document.getElementById("fim").value,
+          finalidade: document.getElementById("finalidade").value,
+          observacoes: document.getElementById("observacoes").value
+        };
+        try {
+          localStorage.setItem(DRAFT_KEY, JSON.stringify(dados));
+        } catch (e) {
+          /* localStorage indisponível: segue sem rascunho */
+        }
+      }
+
+      function limparRascunho() {
+        try {
+          localStorage.removeItem(DRAFT_KEY);
+        } catch (e) {}
+        draftNote.style.display = "none";
+        draftNote.textContent = "";
+      }
+
+      function restaurarRascunho() {
+        let dados;
+        try {
+          const raw = localStorage.getItem(DRAFT_KEY);
+          if (!raw) return;
+          dados = JSON.parse(raw);
+        } catch (e) {
+          return;
+        }
+        if (!dados) return;
+
+        document.getElementById("nome").value = dados.nome || "";
+        document.getElementById("matricula_id").value = dados.matricula_id || "";
+        document.getElementById("email").value = dados.email || "";
+        document.getElementById("telefone").value = dados.telefone || "";
+        document.getElementById("setor").value = dados.setor || "";
+        document.getElementById("inicio").value = dados.inicio || "";
+        document.getElementById("fim").value = dados.fim || "";
+        document.getElementById("finalidade").value = dados.finalidade || "";
+        document.getElementById("observacoes").value = dados.observacoes || "";
+
+        (dados.equipamentos || []).forEach((valor) => {
+          const cb = form.querySelector(`input[name="equipamento"][value="${CSS.escape(valor)}"]`);
+          if (cb) cb.checked = true;
+        });
+
+        draftNote.style.display = "block";
+        draftNote.textContent =
+          "Rascunho restaurado — retomamos o preenchimento anterior deste formulário. " +
+          "O arquivo anexado precisa ser selecionado novamente antes de enviar.";
+      }
+
+      restaurarRascunho();
+      atualizarTermo();
+      form.addEventListener("input", () => { salvarRascunho(); atualizarTermo(); });
+      form.addEventListener("change", () => { salvarRascunho(); atualizarTermo(); });
+
+      baixarTermo.addEventListener("click", () => {
+        window.print();
+      });
+
+      limpar.addEventListener("click", () => {
+        form.reset();
+        msg.textContent = "";
+        atualizarTermo();
+        limparRascunho();
+      });
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        msg.textContent = "";
+        btnEnviar.disabled = true;
+        btnEnviar.textContent = "Enviando...";
+
+        try {
+          const equipamentosSelecionados = Array.from(
+            document.querySelectorAll('input[name="equipamento"]:checked')
+          ).map((item) => item.value).join(", ");
+
+          if (!equipamentosSelecionados) throw new Error("Selecione ao menos um equipamento.");
+
+          const fileInput = document.getElementById("file");
+          const file = fileInput.files[0];
+          if (!file) throw new Error("Anexe o termo de responsabilidade assinado.");
+          if (file.size > 10 * 1024 * 1024) throw new Error("Arquivo maior que 10MB.");
+
+          const base64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.readAsDataURL(file);
+          });
+
+          const payload = {
+            nome: document.getElementById("nome").value,
+            matricula_id: document.getElementById("matricula_id").value,
+            email: document.getElementById("email").value,
+            telefone: document.getElementById("telefone").value,
+            setor: document.getElementById("setor").value,
+            operador: "Equipe do FLUI",
+            equipamentos: equipamentosSelecionados,
+            inicio: document.getElementById("inicio").value,
+            fim: document.getElementById("fim").value,
+            finalidade: document.getElementById("finalidade").value,
+            observacoes: document.getElementById("observacoes").value,
+            file: base64,
+            fileName: file.name
+          };
+
+          await fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          msg.style.color = "green";
+          msg.textContent = "Solicitação realizada com sucesso!";
+          form.reset();
+          atualizarTermo();
+          limparRascunho();
+        } catch (err) {
+          msg.style.color = "red";
+          msg.textContent = "Erro: " + (err.message || String(err));
+        } finally {
+          btnEnviar.disabled = false;
+          btnEnviar.textContent = "Enviar Solicitação";
+        }
+      });
+    </script>
+  </body>
+</html>

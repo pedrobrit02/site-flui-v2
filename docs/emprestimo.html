@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <title>FLUI — Solicitação de Empréstimo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" crossorigin href="./assets/Style-BjHQQnRK.css">
+  </head>
+  <body>
+    <header class="site-header" id="topo">
+      <nav class="nav" aria-label="Navegação principal">
+        <div class="container nav__inner">
+          <a class="brand" href="./index.html" aria-label="Ir para o início">
+            <span class="brand__symbol" aria-hidden="true"></span>
+            <span class="brand__text">FLUI</span>
+          </a>
+
+          <button
+            class="nav__toggle"
+            type="button"
+            aria-expanded="false"
+            aria-controls="nav-menu"
+          >
+            <span class="sr-only">Abrir menu</span>
+            <span class="nav__toggleLines" aria-hidden="true">☰</span>
+          </button>
+
+          <div class="nav__menu" id="nav-menu">
+            <a class="nav__link" href="./index.html#o-que-e">O que é</a>
+            <a class="nav__link" href="./index.html#o-que-oferecemos">O que oferecemos</a>
+            <a class="nav__link" href="./index.html#Utilizar-equipamentos">Equipamentos</a>
+            <a class="nav__link" href="./index.html#eventos">Eventos</a>
+            <a class="nav__link" href="./index.html#documentacao-flui">Documentos</a>
+            <a class="nav__link" href="./index.html#docentes">Docentes</a>
+            <a class="nav__link" href="./index.html#alunos">Bolsistas</a>
+            <a class="nav__cta" href="./uso.html">Uso</a>
+            <a class="nav__cta" href="./emprestimo.html">Empréstimo</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="loan-page">
+      <div class="container">
+        <div class="loan-card">
+          <h1>Solicitação de Empréstimo</h1>
+
+          <div class="draft-note" id="draftNote" style="display: none;"></div>
+
+          <form id="form">
+            <label for="nome">Nome</label>
+            <input id="nome" required />
+
+            <label for="matricula">Matrícula</label>
+            <input id="matricula" required />
+
+            <label for="email">E-mail</label>
+            <input type="email" id="email" required />
+
+            <label for="telefone">Telefone</label>
+            <input type="tel" id="telefone" required />
+
+            <label for="setor">Setor / Curso</label>
+            <input id="setor" required />
+
+            <details class="kit">
+              <summary>Selecionar Itens para Empréstimo</summary>
+              <div id="itens-container"></div>
+            </details>
+
+            <label for="retirada">Data e hora da retirada *</label>
+            <input id="retirada" type="datetime-local" required />
+
+            <label for="devolucao">Data e hora da devolução *</label>
+            <input id="devolucao" type="datetime-local" required />
+
+            <label for="finalidade">Finalidade *</label>
+            <textarea id="finalidade" required></textarea>
+
+            <label for="observacoes">Observações (Opcional)</label>
+            <textarea id="observacoes"></textarea>
+
+            <label>Termo de Responsabilidade</label>
+            <div class="termo-box" id="termoTexto"></div>
+
+            <p class="termo-instrucoes">
+              1. Baixe o termo acima já preenchido com seus dados. 2. Imprima e assine (ou assine
+              digitalmente). 3. Anexe o arquivo assinado abaixo.
+            </p>
+
+            <div class="actions actions--between">
+              <button type="button" class="btn btn--ghost" id="baixarTermo">Baixar termo em PDF</button>
+            </div>
+
+            <label for="file">Anexar termo de responsabilidade assinado (PDF, máx. 10MB)</label>
+            <input type="file" id="file" accept="application/pdf" required />
+
+            <div class="actions">
+              <button type="button" class="btn btn--ghost ghost" id="limpar">Limpar</button>
+              <button type="button" class="btn btn--primary" id="btnEnviar">Enviar Solicitação</button>
+            </div>
+
+            <p class="msg" id="msg"></p>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const navToggle = document.querySelector(".nav__toggle");
+      const navMenu = document.querySelector(".nav__menu");
+      if (navToggle) {
+        navToggle.addEventListener("click", () => {
+          const expanded = navToggle.getAttribute('aria-expanded') === 'true';
+          navToggle.setAttribute('aria-expanded', !expanded);
+          navMenu.classList.toggle('nav__menu--open');
+        });
+      }
+
+      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzesiNEP0jY6PN9odz8F6mrGqQjsEmRR4jgh95hPtEHN7qFL-Qi46vIK_9I2MWe3I1nyg/exec";
+
+      const itens = [
+        ["Cabo USB", 26], ["Adaptador", 3], ["protobord Mb 102", 16], ["protobord menor 400 pontos", 23],
+        ["sensor TCRT5000", 4], ["Potenciômetro 10k", 37], ["Buzzer", 27], ["Resistor 1k", 203],
+        ["Push button", 138], ["Diodo 1N4007", 84], ["Resistor 330", 119], ["led verde", 116],
+        ["led amarelo", 110], ["led vermelho", 116], ["kit braço robótico e chassi", 4],
+        ["reles 4 canais", 5], ["reles 2 canal", 4], ["reles 1 canal", 4], ["sensor de chuva", 4],
+        ["RFID", 7], ["Resistor 470 Ohm", 246], ["Resistor 220 ohms", 98], ["resistor 4.7k Ohm", 50],
+        ["resistor 47k Ohm", 50], ["resistor 47 Ohm", 50], ["resistor 10 Ohm", 100], ["resistor 2.2k Ohm", 50],
+        ["Resistor 220k Ohm", 50], ["Resistor 22k Ohm", 50], ["Resistor 470 Ohm", 75], ["Resistor 100 Ohm", 100],
+        ["Resistor 470k Ohm", 50], ["Resistor 10k Ohm", 100], ["Resistor 1M Ohm", 50], ["Resistor 20 Ohm", 50],
+        ["Resistor 100k Ohm", 50], ["estação conjugada de solda", 2], ["Apontador laser", 1], ["bateria de 9v", 3],
+        ["scanlizard", 1], ["Multímetro", 4], ["conjunto de pilhas 1,5V", 1], ["ceramic Heating", 1],
+        ["cabos VGA", 4], ["cabos Usb de impressora", 4], ["cabo HDMI", 1], ["tab4 galaxy", 2],
+        ["Mesa digitalizadora", 1], ["ferro de solda USB", 3], ["caixa de som multimídia", 1],
+        ["controlador de motor", 2], ["módulo de wifi ESP", 4], ["Módulo sem fio NRF", 4],
+        ["Kit Raspberry pi 4", 1], ["Motor de passo", 8], ["servomotores", 8], ["Arduino", 20],
+        ["ESP", 5], ["LCD 16X2", 12], ["controle e receptor", 9], ["sensor umidade do solo", 4],
+        ["sensor de temperatura", 4], ["LDR (Pacote)", 1], ["sensore seguidor de linha", 5],
+        ["ponte H", 4], ["sensor ultra-sônico", 10], ["Relógio de tempo", 9], ["display de 7 segmentos", 14],
+        ["teclado 4x4", 3], ["Kit de robótica básico", 1], ["placa de desenvolvimento", 5]
+      ];
+
+      const itensContainer = document.getElementById("itens-container");
+      const form = document.getElementById("form");
+      const msg = document.getElementById("msg");
+      const btnEnviar = document.getElementById("btnEnviar");
+      const limpar = document.getElementById("limpar");
+      const draftNote = document.getElementById("draftNote");
+      const termoTexto = document.getElementById("termoTexto");
+      const baixarTermo = document.getElementById("baixarTermo");
+
+      itens.forEach(([nome, max]) => {
+        itensContainer.insertAdjacentHTML(
+          "beforeend",
+          `
+          <div class="item-row">
+            <div class="item-left">
+              <input type="checkbox" class="item" data-item="${nome}" data-max="${max}">
+              <span>${nome} (Máx: ${max})</span>
+            </div>
+            <div class="quantidade-box">
+              <button type="button" class="menos">-</button>
+              <input type="number" value="1" min="1" max="${max}" readonly>
+              <button type="button" class="mais">+</button>
+            </div>
+          </div>
+          `
+        );
+      });
+
+      // --- Geração do Termo de Responsabilidade na própria página ---
+      function formatarData(valor) {
+        if (!valor) return "____/____/______ __:__";
+        const data = new Date(valor);
+        if (Number.isNaN(data.getTime())) return "____/____/______ __:__";
+        return data.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+      }
+
+      function coletarItensSelecionados() {
+        const lista = [];
+        document.querySelectorAll(".item:checked").forEach((cb) => {
+          const qtd = cb.closest(".item-row").querySelector('input[type="number"]').value;
+          lista.push(`${cb.dataset.item} (${qtd})`);
+        });
+        return lista;
+      }
+
+      function gerarTextoTermo() {
+        const nome = document.getElementById("nome").value.trim() || "_______________________________";
+        const matricula = document.getElementById("matricula").value.trim() || "_______________";
+        const contatoPartes = [document.getElementById("telefone").value.trim(), document.getElementById("email").value.trim()].filter(Boolean);
+        const contato = contatoPartes.length ? contatoPartes.join(" / ") : "_______________";
+        const retirada = formatarData(document.getElementById("retirada").value);
+        const devolucao = formatarData(document.getElementById("devolucao").value);
+        const itensSelecionados = coletarItensSelecionados();
+        const listaItens = itensSelecionados.length
+          ? itensSelecionados.map((item) => `• ${item}`).join("\n")
+          : "• (nenhum item selecionado ainda)";
+
+        return `TERMO DE RESPONSABILIDADE – EMPRÉSTIMO DE MATERIAIS DO FLUI
+
+NORMAS DE UTILIZAÇÃO DOS MATERIAIS:
+
+• Os materiais emprestados são de uso institucional e devem ser utilizados exclusivamente para atividades vinculadas ao IFMG Campus Ibirité;
+• O(a) responsável pelo empréstimo deve zelar pela boa conservação e devolvê-los no mesmo estado em que foram entregues;
+• Em caso de perda, extravio, roubo ou dano, o(a) responsável deverá comunicar imediatamente ao FLUI e poderá ser responsabilizado(a);
+• O empréstimo é pessoal e intransferível, sendo vedado o repasse dos materiais a terceiros;
+• A devolução deverá ocorrer na data e hora acordadas abaixo.
+
+RECEBIMENTO DOS MATERIAIS
+
+Declaro ter solicitado ao FLUI o(s) seguinte(s) material(is), a serem retirados em perfeitas condições de uso:
+
+${listaItens}
+
+Retirada prevista: ${retirada}
+Devolução prevista: ${devolucao}
+
+Responsabilizo-me por sua guarda e uso adequado, estando ciente das normas estabelecidas acima.
+
+Nome do(a) responsável: ${nome}
+Matrícula: ${matricula}
+Contato: ${contato}
+
+Assinatura eletrônica do(a) responsável: ${nome}`;
+      }
+
+      function atualizarTermo() {
+        termoTexto.textContent = gerarTextoTermo();
+      }
+
+      // --- Rascunho automático ---
+      // Mantém o preenchimento salvo enquanto a pessoa preenche o formulário,
+      // evitando perda de dados em caso de atualização acidental da página.
+      const DRAFT_KEY = "flui_emprestimo_draft";
+
+      function coletarItensRascunho() {
+        const lista = [];
+        document.querySelectorAll(".item:checked").forEach((cb) => {
+          lista.push({
+            item: cb.dataset.item,
+            qtd: cb.closest(".item-row").querySelector('input[type="number"]').value
+          });
+        });
+        return lista;
+      }
+
+      function salvarRascunho() {
+        const dados = {
+          nome: document.getElementById("nome").value,
+          matricula: document.getElementById("matricula").value,
+          email: document.getElementById("email").value,
+          telefone: document.getElementById("telefone").value,
+          setor: document.getElementById("setor").value,
+          retirada: document.getElementById("retirada").value,
+          devolucao: document.getElementById("devolucao").value,
+          finalidade: document.getElementById("finalidade").value,
+          observacoes: document.getElementById("observacoes").value,
+          itens: coletarItensRascunho()
+        };
+        try {
+          localStorage.setItem(DRAFT_KEY, JSON.stringify(dados));
+        } catch (e) {}
+      }
+
+      function limparRascunho() {
+        try {
+          localStorage.removeItem(DRAFT_KEY);
+        } catch (e) {}
+        draftNote.style.display = "none";
+        draftNote.textContent = "";
+      }
+
+      function restaurarRascunho() {
+        let dados;
+        try {
+          const raw = localStorage.getItem(DRAFT_KEY);
+          if (!raw) return;
+          dados = JSON.parse(raw);
+        } catch (e) {
+          return;
+        }
+        if (!dados) return;
+
+        document.getElementById("nome").value = dados.nome || "";
+        document.getElementById("matricula").value = dados.matricula || "";
+        document.getElementById("email").value = dados.email || "";
+        document.getElementById("telefone").value = dados.telefone || "";
+        document.getElementById("setor").value = dados.setor || "";
+        document.getElementById("retirada").value = dados.retirada || "";
+        document.getElementById("devolucao").value = dados.devolucao || "";
+        document.getElementById("finalidade").value = dados.finalidade || "";
+        document.getElementById("observacoes").value = dados.observacoes || "";
+
+        (dados.itens || []).forEach(({ item, qtd }) => {
+          const cb = itensContainer.querySelector(`input.item[data-item="${CSS.escape(item)}"]`);
+          if (!cb) return;
+          cb.checked = true;
+          const row = cb.closest(".item-row");
+          row.querySelector(".quantidade-box").style.display = "flex";
+          row.querySelector('input[type="number"]').value = qtd;
+        });
+
+        draftNote.style.display = "block";
+        draftNote.textContent =
+          "Rascunho restaurado — retomamos o preenchimento anterior deste formulário. " +
+          "O arquivo anexado precisa ser selecionado novamente antes de enviar.";
+      }
+
+      restaurarRascunho();
+      atualizarTermo();
+      form.addEventListener("input", () => { salvarRascunho(); atualizarTermo(); });
+      form.addEventListener("change", () => { salvarRascunho(); atualizarTermo(); });
+
+      baixarTermo.addEventListener("click", () => {
+        window.print();
+      });
+
+      document.addEventListener("change", (e) => {
+        if (e.target.classList.contains("item")) {
+          const box = e.target.closest(".item-row").querySelector(".quantidade-box");
+          box.style.display = e.target.checked ? "flex" : "none";
+        }
+      });
+
+      document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("mais")) {
+          const row = e.target.closest(".item-row");
+          const input = row.querySelector('input[type="number"]');
+          const max = parseInt(row.querySelector(".item").dataset.max, 10);
+          if (parseInt(input.value, 10) < max) input.value++;
+          atualizarTermo();
+          salvarRascunho();
+        }
+        if (e.target.classList.contains("menos")) {
+          const row = e.target.closest(".item-row");
+          const input = row.querySelector('input[type="number"]');
+          if (parseInt(input.value, 10) > 1) input.value--;
+          atualizarTermo();
+          salvarRascunho();
+        }
+      });
+
+      limpar.addEventListener("click", () => {
+        form.reset();
+        document.querySelectorAll(".quantidade-box").forEach((box) => box.style.display = "none");
+        msg.textContent = "";
+        atualizarTermo();
+        limparRascunho();
+      });
+
+      btnEnviar.addEventListener("click", async () => {
+        btnEnviar.disabled = true;
+        btnEnviar.textContent = "Enviando...";
+        msg.textContent = "";
+
+        try {
+          const itensSelecionados = coletarItensSelecionados().join(", ");
+          if (!itensSelecionados) throw new Error("Selecione ao menos um item.");
+
+          const file = document.getElementById("file").files[0];
+          if (!file) throw new Error("Anexe o termo de responsabilidade assinado.");
+          if (file.size > 10 * 1024 * 1024) throw new Error("Arquivo acima de 10MB.");
+
+          const base64 = await new Promise((resolve, reject) => {
+            const r = new FileReader();
+            r.onload = () => resolve(r.result.split(",")[1]);
+            r.onerror = reject;
+            r.readAsDataURL(file);
+          });
+
+          const payload = {
+            nome: document.getElementById("nome").value,
+            matricula_id: document.getElementById("matricula").value,
+            email: document.getElementById("email").value,
+            telefone: document.getElementById("telefone").value,
+            setor: document.getElementById("setor").value,
+            retirada: document.getElementById("retirada").value,
+            devolucao: document.getElementById("devolucao").value,
+            finalidade: document.getElementById("finalidade").value,
+            observacoes: document.getElementById("observacoes").value,
+            itens: itensSelecionados,
+            file: base64,
+            fileName: file.name
+          };
+
+          await fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            body: JSON.stringify(payload)
+          });
+
+          msg.textContent = "Solicitação enviada com sucesso!";
+          msg.style.color = "green";
+          form.reset();
+          document.querySelectorAll(".quantidade-box").forEach((box) => box.style.display = "none");
+          atualizarTermo();
+          limparRascunho();
+        } catch (e) {
+          msg.textContent = "Erro: " + (e.message || String(e));
+          msg.style.color = "red";
+        } finally {
+          btnEnviar.disabled = false;
+          btnEnviar.textContent = "Enviar Solicitação";
+        }
+      });
+    </script>
+  </body>
+</html>

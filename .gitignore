@@ -1,0 +1,17 @@
+# Pastas de dependências e build
+node_modules
+dist
+.vite
+
+# Estado local do wrangler (cache de dev, banco D1 simulado)
+worker/.wrangler
+.wrangler
+
+# Arquivos de log e sistema
+package-lock.json
+*.log
+.DS_Store
+
+# Variáveis de ambiente (Segurança!)
+.env
+.env.localgit status
