@@ -2,7 +2,7 @@
    fontes definidas em Style.css (--purple, --pink, --blue, --ink, etc.). */
 
 .admin-login {
-  min-height: 100vh;
+  min-height: calc(100vh - var(--header-h));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,7 +93,7 @@
   background: #fff;
   border-bottom: 1px solid rgba(12, 12, 16, 0.08);
   position: sticky;
-  top: 0;
+  top: var(--header-h);
   z-index: 20;
 }
 .admin-header__brand {

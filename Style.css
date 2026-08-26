@@ -199,6 +199,11 @@ img {
   box-shadow: 0 0 0 4px rgba(122, 44, 255, 0.08);
   transform: translateY(-1px);
 }
+.nav__link.is-active {
+  color: var(--purple);
+  background: rgba(122, 44, 255, 0.12);
+  font-weight: 600;
+}
 .nav__link:focus-visible {
   outline: none;
   box-shadow: var(--focus);

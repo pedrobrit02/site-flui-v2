@@ -16,6 +16,35 @@
     <link rel="stylesheet" href="admin.css" />
   </head>
   <body>
+    <header class="site-header" id="topo">
+      <nav class="nav" aria-label="Navegação principal">
+        <div class="container nav__inner">
+          <a class="brand" href="./index.html" aria-label="Ir para o início">
+            <span class="brand__symbol" aria-hidden="true"></span>
+            <span class="brand__text">FLUI</span>
+          </a>
+
+          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-menu">
+            <span class="sr-only">Abrir menu</span>
+            <span class="nav__toggleLines" aria-hidden="true">☰</span>
+          </button>
+
+          <div class="nav__menu" id="nav-menu">
+            <a class="nav__link" href="./index.html#o-que-e">O que é</a>
+            <a class="nav__link" href="./index.html#o-que-oferecemos">O que oferecemos</a>
+            <a class="nav__link" href="./index.html#Utilizar-equipamentos">Equipamentos</a>
+            <a class="nav__link" href="./index.html#eventos">Eventos</a>
+            <a class="nav__link" href="./index.html#documentacao-flui">Documentos</a>
+            <a class="nav__link" href="./index.html#docentes">Docentes</a>
+            <a class="nav__link" href="./index.html#alunos">Bolsistas</a>
+            <a class="nav__link is-active" href="./admin-login.html">Admin</a>
+            <a class="nav__cta" href="./uso.html">Uso</a>
+            <a class="nav__cta" href="./emprestimo.html">Empréstimo</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
     <main class="admin-login">
       <div class="admin-login__card">
         <div class="brand admin-login__brand" aria-hidden="true">
@@ -42,6 +71,16 @@
     </main>
 
     <script>
+      const navToggle = document.querySelector(".nav__toggle");
+      const navMenu = document.querySelector(".nav__menu");
+      if (navToggle) {
+        navToggle.addEventListener("click", () => {
+          const expanded = navToggle.getAttribute("aria-expanded") === "true";
+          navToggle.setAttribute("aria-expanded", !expanded);
+          navMenu.classList.toggle("nav__menu--open");
+        });
+      }
+
       const WORKER_URL = "https://flui-api.pedro-brito-flui.workers.dev";
       const form = document.getElementById("loginForm");
       const msg = document.getElementById("msg");
