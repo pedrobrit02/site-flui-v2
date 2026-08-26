@@ -35,6 +35,16 @@ const nameEscaped = name.replace(/'/g, "''");
 
 const sql = `INSERT INTO admins (id, name, email, password_hash) VALUES ('${id}', '${nameEscaped}', '${emailLower}', '${hash}')`;
 
-console.log("\nRode este comando (de dentro da pasta worker/) pra criar sua conta de admin:\n");
-console.log(`npx wrangler@3 d1 execute flui-db --remote --command="${sql}"`);
+// O hash da senha usa "$" como separador (ex: 100000$salt$hash). Se colarmos
+// esse comando dentro de aspas duplas no bash/zsh sem escapar, o shell tenta
+// interpretar "$salt"/"$hash" como variáveis inexistentes e apaga esse
+// pedaço silenciosamente — corrompendo o hash sem nenhum erro visível.
+// Escapamos aqui os caracteres especiais de dentro de aspas duplas
+// (\, $, `, ") para que o comando impresso seja seguro de colar como está.
+function escapeForDoubleQuotedShell(str) {
+  return str.replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/`/g, "\\`").replace(/"/g, '\\"');
+}
+
+console.log("\nRode este comando (de qualquer pasta do projeto, com o wrangler configurado) pra criar sua conta de admin:\n");
+console.log(`npx wrangler@3 d1 execute flui-db --remote --command="${escapeForDoubleQuotedShell(sql)}"`);
 console.log("\nDepois disso, entre em admin-login.html com este e-mail e senha.\n");
