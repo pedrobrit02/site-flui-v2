@@ -101,6 +101,9 @@
 
         <!-- RELATÓRIOS -->
         <section class="admin-panel" id="panel-relatorios">
+          <div class="admin-panel__toolbar admin-panel__toolbar--end">
+            <button type="button" class="btn btn--ghost" id="baixarRelatorio">Baixar relatório (CSV)</button>
+          </div>
           <div class="stat-grid" id="statGrid"></div>
           <div class="chart-card">
             <h3>Equipamentos mais usados (Uso)</h3>
@@ -114,6 +117,9 @@
 
         <!-- ACESSOS -->
         <section class="admin-panel" id="panel-acessos">
+          <div class="admin-panel__toolbar admin-panel__toolbar--end">
+            <button type="button" class="btn btn--ghost" id="baixarAcessos">Baixar acessos (CSV)</button>
+          </div>
           <div class="stat-grid" id="pageviewGrid"></div>
           <div class="chart-card">
             <h3>Acessos por página (últimos 30 dias)</h3>
@@ -363,10 +369,81 @@
         return `<div class="stat-tile"><div class="stat-tile__value">${valor}</div><div class="stat-tile__label">${rotulo}</div></div>`;
       }
 
+      // --- Download de CSV a partir dos dados já carregados (sem precisar de nova rota no Worker) ---
+      function csvEscape(valor) {
+        const str = valor === null || valor === undefined ? "" : String(valor);
+        if (/[",\n;]/.test(str)) return `"${str.replace(/"/g, '""')}"`;
+        return str;
+      }
+
+      function linhasParaCsv(linhas) {
+        return linhas.map((cols) => cols.map(csvEscape).join(";")).join("\r\n");
+      }
+
+      function baixarCsv(nomeArquivo, conteudo) {
+        const blob = new Blob(["﻿" + conteudo], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = nomeArquivo;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      let ultimoRelatorio = null;
+      let ultimosAcessos = null;
+
+      document.getElementById("baixarRelatorio").addEventListener("click", () => {
+        if (!ultimoRelatorio) return;
+        const d = ultimoRelatorio;
+        const linhas = [
+          ["Resumo", ""],
+          ["Métrica", "Valor"],
+          ["Solicitações de uso", d.uso.total],
+          ["Uso — pendentes", d.uso.por_status.pendente],
+          ["Uso — deferidas", d.uso.por_status.deferido],
+          ["Uso — indeferidas", d.uso.por_status.indeferido],
+          ["Solicitações de empréstimo", d.emprestimo.total],
+          ["Empréstimo — pendentes", d.emprestimo.por_status.pendente],
+          ["Empréstimo — deferidas", d.emprestimo.por_status.deferido],
+          ["Empréstimo — indeferidas", d.emprestimo.por_status.indeferido],
+          ["", ""],
+          ["Equipamentos mais usados", ""],
+          ["Equipamento", "Vezes usado"],
+          ...d.uso.equipamentos_mais_usados.map((i) => [i.nome, i.total]),
+          ["", ""],
+          ["Materiais mais emprestados", ""],
+          ["Material", "Vezes emprestado"],
+          ...d.emprestimo.materiais_mais_emprestados.map((i) => [i.nome, i.total]),
+        ];
+        const dataHoje = new Date().toISOString().slice(0, 10);
+        baixarCsv(`relatorio-flui-${dataHoje}.csv`, linhasParaCsv(linhas));
+      });
+
+      document.getElementById("baixarAcessos").addEventListener("click", () => {
+        if (!ultimosAcessos) return;
+        const d = ultimosAcessos;
+        const rotulosPagina = { index: "Página inicial", uso: "Uso de equipamentos", emprestimo: "Empréstimo", outro: "Outras" };
+        const linhas = [
+          ["Resumo", ""],
+          ["Acessos totais (30 dias)", d.total],
+          ...d.por_pagina.map((p) => [rotulosPagina[p.path] || p.path, p.total]),
+          ["", ""],
+          ["Acessos por dia", ""],
+          ["Dia", "Acessos"],
+          ...d.por_dia.map((diaItem) => [diaItem.dia, diaItem.total]),
+        ];
+        const dataHoje = new Date().toISOString().slice(0, 10);
+        baixarCsv(`acessos-flui-${dataHoje}.csv`, linhasParaCsv(linhas));
+      });
+
       async function carregarRelatorios() {
         const res = await fetch(`${WORKER_URL}/api/admin/stats`, fetchOpts());
         if (!res.ok) return;
         const data = await res.json();
+        ultimoRelatorio = data;
 
         document.getElementById("statGrid").innerHTML = [
           statTile(data.uso.total, "Solicitações de uso"),
@@ -384,6 +461,7 @@
         const res = await fetch(`${WORKER_URL}/api/admin/pageviews?dias=30`, fetchOpts());
         if (!res.ok) return;
         const data = await res.json();
+        ultimosAcessos = data;
 
         const rotulosPagina = { index: "Página inicial", uso: "Uso de equipamentos", emprestimo: "Empréstimo", outro: "Outras" };
         const porPaginaFmt = data.por_pagina.map((p) => ({ nome: rotulosPagina[p.path] || p.path, total: p.total }));

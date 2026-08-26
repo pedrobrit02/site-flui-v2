@@ -155,6 +155,9 @@
   gap: 12px;
   margin-bottom: 16px;
 }
+.admin-panel__toolbar--end {
+  justify-content: flex-end;
+}
 .admin-filter {
   display: flex;
   gap: 6px;
