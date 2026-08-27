@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <meta name="description" content="Biblioteca Comunitária FLUI — consulte o acervo e solicite o empréstimo de livros." />
+    <title>FLUI — Biblioteca</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="Style.css" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <header class="site-header" id="topo">
+      <nav class="nav" aria-label="Navegação principal">
+        <div class="container nav__inner">
+          <a class="brand" href="./index.html" aria-label="Ir para o início">
+            <span class="brand__symbol" aria-hidden="true"></span>
+            <span class="brand__text">FLUI</span>
+          </a>
+
+          <button class="nav__toggle" type="button" aria-expanded="false" aria-controls="nav-menu">
+            <span class="sr-only">Abrir menu</span>
+            <span class="nav__toggleLines" aria-hidden="true">☰</span>
+          </button>
+
+          <div class="nav__menu" id="nav-menu">
+            <a class="nav__link" href="./index.html#o-que-e">O que é</a>
+            <a class="nav__link" href="./index.html#o-que-oferecemos">O que oferecemos</a>
+            <a class="nav__link" href="./index.html#Utilizar-equipamentos">Equipamentos</a>
+            <a class="nav__link" href="./index.html#eventos">Eventos</a>
+            <a class="nav__link" href="./index.html#documentacao-flui">Documentos</a>
+            <a class="nav__link" href="./index.html#docentes">Docentes</a>
+            <a class="nav__link" href="./index.html#alunos">Bolsistas</a>
+            <a class="nav__cta is-active" href="./login.html">Login</a>
+            <a class="nav__cta" href="./uso.html">Uso</a>
+            <a class="nav__cta" href="./emprestimo.html">Empréstimo</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="biblio-hero">
+        <div class="container">
+          <div class="biblio-hero__icon" aria-hidden="true">📚</div>
+          <h1>Biblioteca Comunitária FLUI</h1>
+          <p>
+            Livros, apostilas e materiais de apoio sobre programação, eletrônica, design e
+            fabricação digital — consulte o acervo e solicite o empréstimo de um título direto
+            pelo site.
+          </p>
+
+          <div class="biblio-hero__actions">
+            <a class="btn btn--primary" href="#acervo" style="width:auto;">Ver acervo</a>
+            <button class="btn btn--ghost" type="button" id="btnEntrarBiblioteca" style="width:auto;">
+              Entrar / solicitar empréstimo
+            </button>
+          </div>
+
+          <div class="biblio-status is-checking" id="biblioStatus">
+            <span class="biblio-status__dot" aria-hidden="true"></span>
+            <span id="biblioStatusText">Verificando o sistema de empréstimo…</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="biblio-section" id="acervo">
+        <div class="container">
+          <div class="biblio-section__head">
+            <h2>Categorias do acervo</h2>
+            <p>Uma amostra do que você encontra na Biblioteca. O catálogo completo, com busca e disponibilidade em tempo real, fica disponível após o login.</p>
+          </div>
+
+          <div class="chip-row">
+            <span class="chip">💻 Programação</span>
+            <span class="chip">🤖 Eletrônica &amp; Robótica</span>
+            <span class="chip">🖨️ Impressão 3D</span>
+            <span class="chip">✏️ Design &amp; Prototipagem</span>
+            <span class="chip">🔬 Divulgação Científica</span>
+            <span class="chip">📖 Literatura Geral</span>
+          </div>
+
+          <div class="book-grid">
+            <article class="book-card">
+              <div class="book-card__cover" aria-hidden="true">💻</div>
+              <div class="book-card__body">
+                <div class="book-card__title">Introdução à Programação com Python</div>
+                <div class="book-card__meta">Programação · 3 exemplares</div>
+                <div class="book-card__foot"><span class="badge badge--ok">Disponível</span></div>
+              </div>
+            </article>
+            <article class="book-card">
+              <div class="book-card__cover" aria-hidden="true">🤖</div>
+              <div class="book-card__body">
+                <div class="book-card__title">Arduino Prático: Projetos de Automação</div>
+                <div class="book-card__meta">Eletrônica · 2 exemplares</div>
+                <div class="book-card__foot"><span class="badge badge--ok">Disponível</span></div>
+              </div>
+            </article>
+            <article class="book-card">
+              <div class="book-card__cover" aria-hidden="true">🖨️</div>
+              <div class="book-card__body">
+                <div class="book-card__title">Fabricação Digital e Impressão 3D</div>
+                <div class="book-card__meta">Prototipagem · 1 exemplar</div>
+                <div class="book-card__foot"><span class="badge badge--out">Emprestado</span></div>
+              </div>
+            </article>
+            <article class="book-card">
+              <div class="book-card__cover" aria-hidden="true">✏️</div>
+              <div class="book-card__body">
+                <div class="book-card__title">Design Thinking na Prática</div>
+                <div class="book-card__meta">Design · 2 exemplares</div>
+                <div class="book-card__foot"><span class="badge badge--ok">Disponível</span></div>
+              </div>
+            </article>
+            <article class="book-card">
+              <div class="book-card__cover" aria-hidden="true">🔬</div>
+              <div class="book-card__body">
+                <div class="book-card__title">Uma Breve História do Tempo</div>
+                <div class="book-card__meta">Divulgação Científica · 1 exemplar</div>
+                <div class="book-card__foot"><span class="badge badge--ok">Disponível</span></div>
+              </div>
+            </article>
+            <article class="book-card">
+              <div class="book-card__cover" aria-hidden="true">📖</div>
+              <div class="book-card__body">
+                <div class="book-card__title">Dom Casmurro</div>
+                <div class="book-card__meta">Literatura Geral · 4 exemplares</div>
+                <div class="book-card__foot"><span class="badge badge--out">Emprestado</span></div>
+              </div>
+            </article>
+            <article class="book-card">
+              <div class="book-card__cover" aria-hidden="true">🤖</div>
+              <div class="book-card__body">
+                <div class="book-card__title">Robótica Educacional para Iniciantes</div>
+                <div class="book-card__meta">Eletrônica · 2 exemplares</div>
+                <div class="book-card__foot"><span class="badge badge--ok">Disponível</span></div>
+              </div>
+            </article>
+            <article class="book-card">
+              <div class="book-card__cover" aria-hidden="true">💻</div>
+              <div class="book-card__body">
+                <div class="book-card__title">Estrutura de Dados e Algoritmos</div>
+                <div class="book-card__meta">Programação · 2 exemplares</div>
+                <div class="book-card__foot"><span class="badge badge--ok">Disponível</span></div>
+              </div>
+            </article>
+          </div>
+
+          <p class="biblio-note">
+            Exemplos ilustrativos do acervo. Para ver a lista completa, disponibilidade atualizada
+            e fazer um pedido, <a href="#" id="linkVerAcervoCompleto">entre na Biblioteca</a>.
+          </p>
+        </div>
+      </section>
+
+      <section class="container">
+        <div class="biblio-cta">
+          <h2>Pronto pra alugar um livro?</h2>
+          <p>Faça login com Google, Microsoft, GitHub, Apple ou e-mail e solicite o empréstimo em poucos cliques.</p>
+          <button class="btn btn--primary" type="button" id="btnEntrarBibliotecaRodape">Entrar na Biblioteca</button>
+          <p class="biblio-note" style="margin-top:14px;">
+            <a href="./login.html">← Voltar pra escolha de login</a>
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const navToggle = document.querySelector(".nav__toggle");
+      const navMenu = document.querySelector(".nav__menu");
+      if (navToggle) {
+        navToggle.addEventListener("click", () => {
+          const expanded = navToggle.getAttribute("aria-expanded") === "true";
+          navToggle.setAttribute("aria-expanded", !expanded);
+          navMenu.classList.toggle("nav__menu--open");
+        });
+      }
+
+      // A parte visual da Biblioteca (esta página) NÃO depende do backend
+      // Django estar no ar — ela é 100% estática. Só os botões de "Entrar"
+      // checam se o sistema de empréstimo está disponível antes de redirecionar,
+      // e avisam com uma mensagem clara quando ele está fora do ar.
+      const BIBLIOTECA_URL = "https://bibliotecaflui.pythonanywhere.com/login/";
+      const statusEl = document.getElementById("biblioStatus");
+      const statusText = document.getElementById("biblioStatusText");
+      const btns = [
+        document.getElementById("btnEntrarBiblioteca"),
+        document.getElementById("btnEntrarBibliotecaRodape"),
+      ].filter(Boolean);
+      const linkAcervo = document.getElementById("linkVerAcervoCompleto");
+
+      async function checarBiblioteca() {
+        try {
+          await fetch(BIBLIOTECA_URL, { mode: "no-cors", signal: AbortSignal.timeout(5000) });
+          statusEl.className = "biblio-status is-ok";
+          statusText.textContent = "Sistema de empréstimo ativo";
+          return true;
+        } catch (err) {
+          statusEl.className = "biblio-status is-down";
+          statusText.textContent = "Sistema de empréstimo temporariamente indisponível — o acervo abaixo continua disponível pra consulta.";
+          return false;
+        }
+      }
+
+      async function entrarNaBiblioteca(triggerBtn) {
+        const originalLabel = triggerBtn ? triggerBtn.textContent : null;
+        if (triggerBtn) {
+          triggerBtn.disabled = true;
+          triggerBtn.textContent = "Verificando...";
+        }
+        const ok = await checarBiblioteca();
+        if (ok) {
+          window.location.href = BIBLIOTECA_URL;
+          return;
+        }
+        if (triggerBtn) {
+          triggerBtn.disabled = false;
+          triggerBtn.textContent = originalLabel;
+        }
+      }
+
+      btns.forEach((btn) => btn.addEventListener("click", () => entrarNaBiblioteca(btn)));
+      if (linkAcervo) {
+        linkAcervo.addEventListener("click", (e) => {
+          e.preventDefault();
+          entrarNaBiblioteca(null);
+        });
+      }
+
+      // Checagem automática ao carregar a página, só pra exibir o status —
+      // não bloqueia nem esconde nenhum conteúdo visual.
+      checarBiblioteca();
+    </script>
+  </body>
+</html>

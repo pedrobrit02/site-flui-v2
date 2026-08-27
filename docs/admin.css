@@ -18,6 +18,82 @@
   box-shadow: var(--shadow);
   padding: 32px 28px;
 }
+
+/* --- Escolha de login (hub /login.html) --- */
+.login-choice__card {
+  width: 100%;
+  max-width: 640px;
+  background: #fff;
+  border-radius: var(--radius);
+  border: 1px solid rgba(12, 12, 16, 0.1);
+  box-shadow: var(--shadow);
+  padding: 40px 36px;
+}
+.login-choice__options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 26px;
+}
+@media (max-width: 560px) {
+  .login-choice__options {
+    grid-template-columns: 1fr;
+  }
+}
+.login-choice__option {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid rgba(12, 12, 16, 0.12);
+  border-radius: 16px;
+  padding: 22px 20px;
+  background: #fff;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+.login-choice__option:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-sm);
+  border-color: rgba(122, 44, 255, 0.35);
+}
+.login-choice__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  background: rgba(122, 44, 255, 0.1);
+  color: var(--purple);
+  margin-bottom: 12px;
+}
+.login-choice__option h3 {
+  margin: 0 0 6px;
+  font-size: 1.02rem;
+}
+.login-choice__option p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+.login-choice__status {
+  margin-top: 10px;
+  font-size: 0.78rem;
+  font-weight: 650;
+  display: none;
+}
+.login-choice__status.is-checking {
+  display: block;
+  color: var(--muted);
+}
+.login-choice__status.is-down {
+  display: block;
+  color: #c0392b;
+}
 .admin-login__brand {
   display: flex;
   align-items: center;
@@ -391,4 +467,200 @@ table.admin-table {
 .admin-row-actions button:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+}
+
+/* ==========================================================================
+   Biblioteca — página visual (biblioteca.html)
+   Sempre renderiza, independente do backend Django estar no ar ou não.
+   ========================================================================== */
+.biblio-hero {
+  background:
+    radial-gradient(80% 60% at 15% 0%, rgba(255, 46, 166, 0.1), transparent 60%),
+    radial-gradient(70% 60% at 100% 20%, rgba(43, 123, 255, 0.1), transparent 60%),
+    linear-gradient(160deg, rgba(255, 46, 166, 0.05), rgba(122, 44, 255, 0.05) 45%, rgba(43, 123, 255, 0.05));
+  padding: 56px 0 44px;
+  text-align: center;
+}
+.biblio-hero__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  margin: 0 auto 18px;
+  background: rgba(122, 44, 255, 0.1);
+}
+.biblio-hero h1 {
+  margin: 0 0 12px;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  letter-spacing: -0.02em;
+}
+.biblio-hero p {
+  margin: 0 auto;
+  max-width: 560px;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+.biblio-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 26px;
+}
+.biblio-hero__actions .btn {
+  width: auto;
+  padding: 12px 26px;
+}
+
+.biblio-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 650;
+  background: rgba(12, 12, 16, 0.06);
+  color: var(--muted);
+}
+.biblio-status__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+.biblio-status.is-checking { color: var(--muted); }
+.biblio-status.is-ok { background: rgba(26, 156, 92, 0.12); color: #1a9c5c; }
+.biblio-status.is-down { background: rgba(230, 158, 0, 0.14); color: #a06600; }
+
+.biblio-section {
+  padding: 8px 0 56px;
+}
+.biblio-section__head {
+  text-align: center;
+  max-width: 620px;
+  margin: 0 auto 30px;
+}
+.biblio-section__head h2 {
+  margin: 0 0 8px;
+  font-size: 1.4rem;
+  letter-spacing: -0.01em;
+}
+.biblio-section__head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 36px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(12, 12, 16, 0.12);
+  background: #fff;
+  font-size: 0.84rem;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 20px;
+}
+.book-card {
+  background: #fff;
+  border: 1px solid rgba(12, 12, 16, 0.1);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.book-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-sm);
+}
+.book-card__cover {
+  aspect-ratio: 3 / 4;
+  background: linear-gradient(160deg, rgba(255, 46, 166, 0.14), rgba(122, 44, 255, 0.12) 50%, rgba(43, 123, 255, 0.14));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--purple);
+  font-size: 2rem;
+}
+.book-card__body {
+  padding: 14px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+.book-card__title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
+.book-card__meta {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.book-card__foot {
+  margin-top: auto;
+  padding-top: 8px;
+}
+.badge--ok { background: rgba(26, 156, 92, 0.12); color: #1a9c5c; }
+.badge--out { background: rgba(192, 57, 43, 0.12); color: #c0392b; }
+
+.biblio-note {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.86rem;
+  margin-top: 28px;
+}
+.biblio-note a { color: var(--purple); font-weight: 650; }
+
+.biblio-cta {
+  text-align: center;
+  padding: 44px 24px;
+  margin: 0 auto 60px;
+  max-width: 780px;
+  background: #fff;
+  border: 1px solid rgba(12, 12, 16, 0.1);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+.biblio-cta h2 {
+  margin: 0 0 10px;
+  font-size: 1.3rem;
+}
+.biblio-cta p {
+  margin: 0 auto 22px;
+  max-width: 460px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.biblio-cta .btn {
+  width: auto;
+  padding: 13px 30px;
+}
+
+@media (max-width: 640px) {
+  .biblio-hero { padding: 44px 0 32px; }
 }
