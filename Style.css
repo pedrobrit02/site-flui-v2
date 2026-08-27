@@ -128,6 +128,10 @@ img {
   box-shadow: 0 10px 35px rgba(10, 10, 20, 0.06);
 }
 .nav__inner {
+  /* a navbar cresceu (Admin + Biblioteca + Uso + Empréstimo); usa uma largura
+     própria, maior que --container, só pro cabeçalho, sem alargar o resto
+     das seções da página. */
+  width: min(1320px, calc(100% - 2 * var(--pad)));
   height: var(--header-h);
   display: flex;
   align-items: center;
