@@ -664,3 +664,116 @@ table.admin-table {
 @media (max-width: 640px) {
   .biblio-hero { padding: 44px 0 32px; }
 }
+.biblio-hero { min-height: calc(100vh - var(--header-h)); display: flex; align-items: center; }
+.biblio-hero .container { width: min(560px, calc(100% - 48px)); }
+
+/* --- Tela geral de login (login.html) --- */
+.auth-shell {
+  min-height: calc(100vh - var(--header-h));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(80% 60% at 15% 0%, rgba(255, 46, 166, 0.1), transparent 60%),
+    radial-gradient(70% 60% at 100% 20%, rgba(43, 123, 255, 0.1), transparent 60%),
+    var(--tint);
+  padding: 32px 24px;
+}
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 34px 30px;
+}
+.auth-card__subtitle {
+  margin: 0 0 24px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.oauth-stack { display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
+.btn-oauth {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font: inherit;
+  font-weight: 650;
+  font-size: 0.88rem;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.btn-oauth:hover { background: var(--tint); border-color: rgba(12, 12, 16, 0.2); }
+.btn-oauth svg { width: 19px; height: 19px; flex: none; }
+.btn-oauth--apple { background: #000; color: #fff; border-color: #000; }
+.btn-oauth--apple:hover { background: #1a1a1a; }
+.btn-oauth--github { background: #171515; color: #fff; border-color: #171515; }
+.btn-oauth--github:hover { background: #2b2828; }
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+.divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+.field { margin-bottom: 16px; }
+.field label {
+  display: block;
+  font-weight: 650;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+.field input {
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font: inherit;
+  background: #fff;
+  color: var(--ink);
+}
+.field input:focus-visible {
+  outline: none;
+  border-color: rgba(122, 44, 255, 0.45);
+  box-shadow: var(--focus);
+}
+
+/* --- Diálogo "Em fase de implantação" (reaproveita o padrão do #decisaoDialog) --- */
+#implantacaoDialog {
+  border: none;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px 26px;
+  width: 100%;
+  max-width: 420px;
+}
+#implantacaoDialog::backdrop {
+  background: rgba(12, 12, 16, 0.45);
+}
+#implantacaoDialog h3 {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+}
+#implantacaoDialog p {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+#implantacaoDialog .actions {
+  display: flex;
+  justify-content: flex-end;
+}
