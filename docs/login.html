@@ -86,6 +86,8 @@
             <input type="password" id="password" required autocomplete="current-password" />
           </div>
 
+          <div class="msg msg--error" id="msg" style="display: none"></div>
+
           <button type="submit" class="btn btn--primary" id="btnEntrar" style="width:100%;">Entrar</button>
         </form>
 
@@ -100,10 +102,9 @@
     <dialog id="implantacaoDialog">
       <h3>Em fase de implantação</h3>
       <p>
-        O sistema de login e cadastro da FLUI ainda está sendo implantado no servidor e não
-        respondeu agora. Em breve, administradores vão cair direto no gerenciamento da Biblioteca
-        e dos empréstimos de equipamentos, e os demais usuários vão direto pra página de aluguel
-        de livros. Tenta de novo daqui a pouco.
+        O login com Google, Microsoft, GitHub ou Apple (e o cadastro de usuários da Biblioteca)
+        ainda está sendo implantado no servidor e não respondeu agora. Pra entrar no painel do
+        FabLab, use e-mail e senha aqui do lado. Tenta de novo daqui a pouco.
       </p>
       <div class="actions">
         <button class="btn btn--primary" type="button" id="btnFecharDialog" style="width:auto;">Entendi</button>
@@ -150,12 +151,56 @@
         });
       });
 
-      document.getElementById("loginForm").addEventListener("submit", (e) => {
+      // Login com e-mail/senha vai direto pro painel administrativo do FabLab
+      // (já implantado e funcionando hoje), não pra Biblioteca.
+      const WORKER_URL = "https://flui-api.pedro-brito-flui.workers.dev";
+      const loginForm = document.getElementById("loginForm");
+      const msg = document.getElementById("msg");
+      const btnEntrar = document.getElementById("btnEntrar");
+
+      function mostrarErro(texto) {
+        msg.textContent = texto;
+        msg.style.display = "block";
+      }
+
+      // Se já tiver sessão de admin válida, pula direto pro painel.
+      (async () => {
+        try {
+          const res = await fetch(`${WORKER_URL}/api/admin/me`, { credentials: "include" });
+          if (res.ok) window.location.href = "./admin.html";
+        } catch (e) {
+          /* segue para o login normalmente */
+        }
+      })();
+
+      loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        // Por segurança, e-mail/senha são enviados direto na tela real de
-        // login do Django (não dá pra repassar credenciais entre domínios
-        // diferentes com segurança) — os campos aqui servem de atalho visual.
-        irParaBiblioteca(BIBLIOTECA_BASE + "/login/");
+        msg.style.display = "none";
+        btnEntrar.disabled = true;
+        btnEntrar.textContent = "Entrando...";
+
+        try {
+          const res = await fetch(`${WORKER_URL}/api/admin/login`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: document.getElementById("email").value.trim(),
+              password: document.getElementById("password").value,
+            }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            mostrarErro(data.error || "Não foi possível entrar.");
+            return;
+          }
+          window.location.href = "./admin.html";
+        } catch (err) {
+          mostrarErro("Erro de conexão. Tente novamente.");
+        } finally {
+          btnEntrar.disabled = false;
+          btnEntrar.textContent = "Entrar";
+        }
       });
 
       document.getElementById("btnCadastro").addEventListener("click", () => {
