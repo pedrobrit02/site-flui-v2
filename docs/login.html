@@ -115,8 +115,8 @@
             <input type="email" id="cadEmail" name="email" required autocomplete="email" />
           </div>
           <div class="field">
-            <label for="cadMatricula">Matrícula (opcional)</label>
-            <input type="text" id="cadMatricula" name="matricula" autocomplete="off" />
+            <label for="cadMatricula">Matrícula</label>
+            <input type="text" id="cadMatricula" name="matricula" required autocomplete="off" />
           </div>
           <div class="field">
             <label for="cadCursoSetor">Curso/Setor</label>
@@ -315,6 +315,10 @@
         const senha = document.getElementById("cadSenha").value;
         const senhaConfirmar = document.getElementById("cadSenhaConfirmar").value;
 
+        if (!matricula) {
+          mostrarErroCadastro("A matrícula é obrigatória.");
+          return;
+        }
         if (senha.length < 8) {
           mostrarErroCadastro("A senha precisa ter pelo menos 8 caracteres.");
           return;
@@ -335,7 +339,7 @@
             body: JSON.stringify({
               nome,
               email,
-              matricula: matricula || undefined,
+              matricula,
               curso_setor: cursoSetor,
               vinculo,
               password: senha,

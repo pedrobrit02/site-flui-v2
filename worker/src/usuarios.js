@@ -37,7 +37,7 @@ export async function handleCadastroUsuario(request, env) {
   const nome = String(body.nome || "").trim();
   const email = String(body.email || "").trim().toLowerCase();
   const password = String(body.password || "");
-  const matricula = body.matricula ? String(body.matricula).trim() : null;
+  const matricula = String(body.matricula || "").trim();
   const cursoSetor = String(body.curso_setor || "").trim();
   const vinculo = String(body.vinculo || "").trim().toLowerCase();
 
@@ -49,6 +49,9 @@ export async function handleCadastroUsuario(request, env) {
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return json(request, { error: "E-mail inválido" }, 400);
+  }
+  if (!matricula) {
+    return json(request, { error: "Matrícula é obrigatória" }, 400);
   }
   if (!cursoSetor) {
     return json(request, { error: "Curso/setor é obrigatório" }, 400);
