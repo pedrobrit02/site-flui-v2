@@ -750,6 +750,22 @@ table.admin-table {
   border-color: rgba(122, 44, 255, 0.45);
   box-shadow: var(--focus);
 }
+.field select {
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font: inherit;
+  background: #fff;
+  color: var(--ink);
+}
+.field select:focus-visible {
+  outline: none;
+  border-color: rgba(122, 44, 255, 0.45);
+  box-shadow: var(--focus);
+}
+.field-hint { margin: 6px 0 0; font-size: 0.78rem; color: var(--muted); }
+.auth-card--wide { max-width: 440px; }
 .auth-card__head { text-align: center; margin-bottom: 22px; }
 .auth-card__head .brand { justify-content: center; margin-bottom: 14px; }
 .auth-card__head h1 { margin: 0; }

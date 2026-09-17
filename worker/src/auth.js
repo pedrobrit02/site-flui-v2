@@ -124,6 +124,10 @@ export async function verifySessionToken(token, secret) {
 }
 
 const SESSION_COOKIE = "flui_admin_session";
+// Cookie separado para contas de usuário/patrono (cadastro da Biblioteca),
+// pra não misturar com a sessão de admin do painel — são tabelas e níveis
+// de acesso diferentes.
+const USER_SESSION_COOKIE = "flui_user_session";
 
 export function parseCookies(request) {
   const header = request.headers.get("Cookie") || "";
@@ -138,20 +142,41 @@ export function parseCookies(request) {
   return out;
 }
 
-export function sessionCookieHeader(token) {
+function cookieHeader(name, token) {
   // SameSite=None + Secure: o painel (GitHub Pages) e a API (workers.dev)
   // são origens diferentes, então o cookie precisa ser explicitamente
   // liberado para uso cross-site.
-  return `${SESSION_COOKIE}=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=${60 * 60 * 12}`;
+  return `${name}=${encodeURIComponent(token)}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=${60 * 60 * 12}`;
+}
+
+function clearCookieHeader(name) {
+  return `${name}=; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=0`;
+}
+
+export function sessionCookieHeader(token) {
+  return cookieHeader(SESSION_COOKIE, token);
 }
 
 export function clearSessionCookieHeader() {
-  return `${SESSION_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=0`;
+  return clearCookieHeader(SESSION_COOKIE);
+}
+
+export function userSessionCookieHeader(token) {
+  return cookieHeader(USER_SESSION_COOKIE, token);
+}
+
+export function clearUserSessionCookieHeader() {
+  return clearCookieHeader(USER_SESSION_COOKIE);
 }
 
 export function getSessionTokenFromRequest(request) {
   const cookies = parseCookies(request);
   return cookies[SESSION_COOKIE] || null;
+}
+
+export function getUserSessionTokenFromRequest(request) {
+  const cookies = parseCookies(request);
+  return cookies[USER_SESSION_COOKIE] || null;
 }
 
 export async function requireAdmin(request, env) {
@@ -160,4 +185,12 @@ export async function requireAdmin(request, env) {
   const payload = await verifySessionToken(token, env.SESSION_SECRET);
   if (!payload || !payload.adminId) return null;
   return payload; // { adminId, name, email, exp }
+}
+
+export async function requireUsuario(request, env) {
+  const token = getUserSessionTokenFromRequest(request);
+  if (!token) return null;
+  const payload = await verifySessionToken(token, env.SESSION_SECRET);
+  if (!payload || !payload.usuarioId) return null;
+  return payload; // { usuarioId, nome, email, exp }
 }

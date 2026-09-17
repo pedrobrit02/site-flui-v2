@@ -23,6 +23,12 @@ import {
   handleListAdmins,
   handleCreateAdmin,
 } from "./admin.js";
+import {
+  handleCadastroUsuario,
+  handleLoginUsuario,
+  handleLogoutUsuario,
+  handleMeUsuario,
+} from "./usuarios.js";
 
 export default {
   async fetch(request, env) {
@@ -119,6 +125,14 @@ export default {
       if (path === "/api/admin/login" && request.method === "POST") return handleLogin(request, env);
       if (path === "/api/admin/logout" && request.method === "POST") return handleLogout(request);
       if (path === "/api/admin/me" && request.method === "GET") return handleMe(request, env);
+
+      // --- Contas de usuário/patrono (cadastro da Biblioteca) ---
+      if (path === "/api/usuarios/cadastro" && request.method === "POST") {
+        return handleCadastroUsuario(request, env);
+      }
+      if (path === "/api/usuarios/login" && request.method === "POST") return handleLoginUsuario(request, env);
+      if (path === "/api/usuarios/logout" && request.method === "POST") return handleLogoutUsuario(request);
+      if (path === "/api/usuarios/me" && request.method === "GET") return handleMeUsuario(request, env);
 
       // --- Admins (gestão de contas) ---
       if (path === "/api/admin/admins" && request.method === "GET") return handleListAdmins(request, env);
