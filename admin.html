@@ -76,6 +76,7 @@
               <button type="button" data-status="indeferido">Indeferidas</button>
             </div>
             <a class="btn btn--ghost" id="exportUso" href="#" target="_blank" rel="noopener">Exportar CSV</a>
+            <button type="button" class="btn btn--ghost" id="exportUsoPdf">Exportar PDF</button>
           </div>
           <div class="admin-table-wrap">
             <table class="admin-table">
@@ -107,6 +108,7 @@
               <button type="button" data-status="indeferido">Indeferidas</button>
             </div>
             <a class="btn btn--ghost" id="exportEmprestimo" href="#" target="_blank" rel="noopener">Exportar CSV</a>
+            <button type="button" class="btn btn--ghost" id="exportEmprestimoPdf">Exportar PDF</button>
           </div>
           <div class="admin-table-wrap">
             <table class="admin-table">
@@ -132,6 +134,7 @@
         <section class="admin-panel" id="panel-relatorios">
           <div class="admin-panel__toolbar admin-panel__toolbar--end">
             <button type="button" class="btn btn--ghost" id="baixarRelatorio">Baixar relatório (CSV)</button>
+            <button type="button" class="btn btn--ghost" id="baixarRelatorioPdf">Baixar relatório (PDF)</button>
           </div>
           <div class="stat-grid" id="statGrid"></div>
           <div class="chart-card">
@@ -197,8 +200,15 @@
     <dialog id="decisaoDialog">
       <form method="dialog" id="decisaoForm">
         <h3 id="decisaoTitulo">Confirmar decisão</h3>
+        <div id="decisaoConsumo" style="display: none">
+          <label for="decisaoFilamento">Filamento usado (kg) — opcional</label>
+          <input type="number" id="decisaoFilamento" min="0" step="0.01" placeholder="ex: 0.35" />
+          <label for="decisaoMdf">MDF usado (metros) — opcional</label>
+          <input type="number" id="decisaoMdf" min="0" step="0.01" placeholder="ex: 1.20" />
+        </div>
         <label for="decisaoMotivo">Observação para o e-mail (opcional)</label>
         <textarea id="decisaoMotivo" rows="3"></textarea>
+        <div class="msg msg--error" id="decisaoErro" style="display: none"></div>
         <div class="actions">
           <button type="button" class="btn btn--ghost" id="decisaoCancelar">Cancelar</button>
           <button type="submit" class="btn btn--primary" id="decisaoConfirmar">Confirmar</button>
@@ -206,6 +216,8 @@
       </form>
     </dialog>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <script>
       const navToggle = document.querySelector(".nav__toggle");
       const navMenu = document.querySelector(".nav__menu");
@@ -273,6 +285,10 @@
         return d.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
       }
 
+      function formatarNumero(n) {
+        return (Number(n) || 0).toLocaleString("pt-BR", { maximumFractionDigits: 2 });
+      }
+
       async function carregarSolicitacoes(tipo, status) {
         const qs = status ? `?tipo=${tipo}&status=${status}` : `?tipo=${tipo}`;
         const res = await fetch(`${WORKER_URL}/api/admin/solicitacoes${qs}`, fetchOpts());
@@ -281,17 +297,27 @@
         renderizarTabela(tipo, data.solicitacoes);
       }
 
+      let ultimaListaUso = [];
+      let ultimaListaEmprestimo = [];
+
       function renderizarTabela(tipo, linhas) {
         const corpo = document.getElementById(tipo === "uso" ? "tabelaUso" : "tabelaEmprestimo");
         const vazio = document.getElementById(tipo === "uso" ? "usoVazio" : "emprestimoVazio");
         corpo.innerHTML = "";
         vazio.style.display = linhas.length ? "none" : "block";
 
+        if (tipo === "uso") ultimaListaUso = linhas;
+        else ultimaListaEmprestimo = linhas;
+
         linhas.forEach((item) => {
           const itens = tipo === "uso" ? item.equipamentos : item.materiais;
-          const itensTexto = (itens || [])
+          let itensTexto = (itens || [])
             .map((it) => (typeof it === "string" ? it : `${it.nome} (${it.quantidade || 1})`))
             .join(", ");
+          const consumoPartes = [];
+          if (item.filamento_kg) consumoPartes.push(`${formatarNumero(item.filamento_kg)}kg filamento`);
+          if (item.mdf_metros) consumoPartes.push(`${formatarNumero(item.mdf_metros)}m MDF`);
+          if (consumoPartes.length) itensTexto += ` · ${consumoPartes.join(", ")}`;
           const dataPrincipal = tipo === "uso" ? item.inicio : item.data_retirada;
 
           const tr = document.createElement("tr");
@@ -338,6 +364,10 @@
         document.getElementById("decisaoTitulo").textContent =
           status === "deferido" ? `Deferir solicitação de ${nome}?` : `Indeferir solicitação de ${nome}?`;
         document.getElementById("decisaoMotivo").value = "";
+        document.getElementById("decisaoFilamento").value = "";
+        document.getElementById("decisaoMdf").value = "";
+        document.getElementById("decisaoConsumo").style.display = status === "deferido" ? "block" : "none";
+        document.getElementById("decisaoErro").style.display = "none";
         dialog.showModal();
       }
 
@@ -348,6 +378,10 @@
         if (!decisaoAtual) return;
         const { tipo, id, status } = decisaoAtual;
         const motivo = document.getElementById("decisaoMotivo").value.trim();
+        const filamento = document.getElementById("decisaoFilamento").value;
+        const mdf = document.getElementById("decisaoMdf").value;
+        const decisaoErro = document.getElementById("decisaoErro");
+        decisaoErro.style.display = "none";
 
         const btnConfirmar = document.getElementById("decisaoConfirmar");
         btnConfirmar.disabled = true;
@@ -355,13 +389,36 @@
           const res = await fetch(`${WORKER_URL}/api/admin/solicitacoes/${tipo}/${id}/decidir`, fetchOpts({
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status, motivo: motivo || undefined }),
+            body: JSON.stringify({
+              status,
+              motivo: motivo || undefined,
+              filamento_kg: filamento === "" ? undefined : filamento,
+              mdf_metros: mdf === "" ? undefined : mdf,
+            }),
           }));
-          if (res.ok) {
-            dialog.close();
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            decisaoErro.textContent = data.error || "Não foi possível salvar a decisão.";
+            decisaoErro.style.display = "block";
+            return;
+          }
+          if (data.email && data.email.ok === false) {
+            // A decisão foi salva, mas o e-mail automático falhou (provavelmente
+            // RESEND_API_KEY não configurado no Worker) — avisa o admin em vez
+            // de deixar isso passar em silêncio.
+            decisaoErro.textContent =
+              "Decisão salva, mas o e-mail automático não foi enviado (verifique a configuração de e-mail do sistema).";
+            decisaoErro.style.display = "block";
             const statusAtivo = document.querySelector(`.admin-filter[data-filter-for="${tipo}"] button.is-active`);
             carregarSolicitacoes(tipo, statusAtivo ? statusAtivo.dataset.status : "");
+            return;
           }
+          dialog.close();
+          const statusAtivo = document.querySelector(`.admin-filter[data-filter-for="${tipo}"] button.is-active`);
+          carregarSolicitacoes(tipo, statusAtivo ? statusAtivo.dataset.status : "");
+        } catch (err) {
+          decisaoErro.textContent = "Erro de conexão. Tente novamente.";
+          decisaoErro.style.display = "block";
         } finally {
           btnConfirmar.disabled = false;
         }
@@ -478,17 +535,134 @@
         baixarCsv(`acessos-flui-${dataHoje}.csv`, linhasParaCsv(linhas));
       });
 
+      // --- Exportação em PDF (jsPDF + autoTable, carregados via CDN) ---
+      const rotulosStatus = { pendente: "Pendente", deferido: "Deferido", indeferido: "Indeferido" };
+
+      function criarPdf(orientation = "landscape") {
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+          alert("Não foi possível carregar o gerador de PDF. Verifique sua conexão e tente novamente.");
+          return null;
+        }
+        return new window.jspdf.jsPDF({ orientation, unit: "pt" });
+      }
+
+      function cabecalhoPdf(doc, titulo) {
+        doc.setFontSize(14);
+        doc.text(titulo, 40, 40);
+        doc.setFontSize(9);
+        doc.setTextColor(120);
+        doc.text(`Gerado em ${new Date().toLocaleString("pt-BR")}`, 40, 56);
+        doc.setTextColor(0);
+      }
+
+      function itensTextoPara(tipo, item) {
+        const itens = tipo === "uso" ? item.equipamentos : item.materiais;
+        let texto = (itens || [])
+          .map((it) => (typeof it === "string" ? it : `${it.nome} (${it.quantidade || 1})`))
+          .join(", ");
+        const consumoPartes = [];
+        if (item.filamento_kg) consumoPartes.push(`${formatarNumero(item.filamento_kg)}kg filamento`);
+        if (item.mdf_metros) consumoPartes.push(`${formatarNumero(item.mdf_metros)}m MDF`);
+        if (consumoPartes.length) texto += ` · ${consumoPartes.join(", ")}`;
+        return texto;
+      }
+
+      function exportarTabelaPdf(tipo, linhas, tituloDoc, nomeArquivo) {
+        if (!linhas || !linhas.length) {
+          alert("Não há solicitações para exportar.");
+          return;
+        }
+        const doc = criarPdf("landscape");
+        if (!doc) return;
+        cabecalhoPdf(doc, tituloDoc);
+        const cabecalho = tipo === "uso"
+          ? ["Nome", "Contato", "Equipamentos", "Início", "Finalidade", "Status"]
+          : ["Nome", "Contato", "Materiais", "Retirada", "Finalidade", "Status"];
+        const corpo = linhas.map((item) => [
+          item.nome || "",
+          [item.email, item.telefone].filter(Boolean).join(" · "),
+          itensTextoPara(tipo, item),
+          formatarDataHora(tipo === "uso" ? item.inicio : item.data_retirada),
+          item.finalidade || "",
+          rotulosStatus[item.status] || item.status || "",
+        ]);
+        doc.autoTable({ startY: 68, head: [cabecalho], body: corpo, styles: { fontSize: 8, cellPadding: 4 }, headStyles: { fillColor: [30, 30, 30] } });
+        doc.save(nomeArquivo);
+      }
+
+      document.getElementById("exportUsoPdf").addEventListener("click", () => {
+        const dataHoje = new Date().toISOString().slice(0, 10);
+        exportarTabelaPdf("uso", ultimaListaUso, "FLUI — Solicitações de Uso", `solicitacoes-uso-${dataHoje}.pdf`);
+      });
+
+      document.getElementById("exportEmprestimoPdf").addEventListener("click", () => {
+        const dataHoje = new Date().toISOString().slice(0, 10);
+        exportarTabelaPdf("emprestimo", ultimaListaEmprestimo, "FLUI — Solicitações de Empréstimo", `solicitacoes-emprestimo-${dataHoje}.pdf`);
+      });
+
+      document.getElementById("baixarRelatorioPdf").addEventListener("click", () => {
+        if (!ultimoRelatorio) return;
+        const d = ultimoRelatorio;
+        const consumo = d.materiais_consumidos || { filamento_kg: 0, mdf_metros: 0 };
+        const doc = criarPdf("portrait");
+        if (!doc) return;
+        cabecalhoPdf(doc, "FLUI — Relatório geral");
+
+        doc.autoTable({
+          startY: 68,
+          head: [["Métrica", "Valor"]],
+          body: [
+            ["Solicitações de uso", d.uso.total],
+            ["Uso — pendentes", d.uso.por_status.pendente],
+            ["Uso — deferidas", d.uso.por_status.deferido],
+            ["Uso — indeferidas", d.uso.por_status.indeferido],
+            ["Solicitações de empréstimo", d.emprestimo.total],
+            ["Empréstimo — pendentes", d.emprestimo.por_status.pendente],
+            ["Empréstimo — deferidas", d.emprestimo.por_status.deferido],
+            ["Empréstimo — indeferidas", d.emprestimo.por_status.indeferido],
+            ["Filamento gasto (kg)", formatarNumero(consumo.filamento_kg)],
+            ["MDF gasto (m)", formatarNumero(consumo.mdf_metros)],
+          ],
+          styles: { fontSize: 9, cellPadding: 4 },
+          headStyles: { fillColor: [30, 30, 30] },
+        });
+
+        doc.text("Equipamentos mais usados", 40, doc.lastAutoTable.finalY + 24);
+        doc.autoTable({
+          startY: doc.lastAutoTable.finalY + 32,
+          head: [["Equipamento", "Vezes usado"]],
+          body: (d.uso.equipamentos_mais_usados || []).map((i) => [i.nome, i.total]),
+          styles: { fontSize: 9, cellPadding: 4 },
+          headStyles: { fillColor: [30, 30, 30] },
+        });
+
+        doc.text("Materiais mais emprestados", 40, doc.lastAutoTable.finalY + 24);
+        doc.autoTable({
+          startY: doc.lastAutoTable.finalY + 32,
+          head: [["Material", "Vezes emprestado"]],
+          body: (d.emprestimo.materiais_mais_emprestados || []).map((i) => [i.nome, i.total]),
+          styles: { fontSize: 9, cellPadding: 4 },
+          headStyles: { fillColor: [30, 30, 30] },
+        });
+
+        const dataHoje = new Date().toISOString().slice(0, 10);
+        doc.save(`relatorio-flui-${dataHoje}.pdf`);
+      });
+
       async function carregarRelatorios() {
         const res = await fetch(`${WORKER_URL}/api/admin/stats`, fetchOpts());
         if (!res.ok) return;
         const data = await res.json();
         ultimoRelatorio = data;
 
+        const consumo = data.materiais_consumidos || { filamento_kg: 0, mdf_metros: 0 };
         document.getElementById("statGrid").innerHTML = [
           statTile(data.uso.total, "Solicitações de uso"),
           statTile(data.uso.por_status.pendente, "Uso — pendentes"),
           statTile(data.emprestimo.total, "Solicitações de empréstimo"),
           statTile(data.emprestimo.por_status.pendente, "Empréstimo — pendentes"),
+          statTile(formatarNumero(consumo.filamento_kg) + " kg", "Filamento gasto"),
+          statTile(formatarNumero(consumo.mdf_metros) + " m", "MDF gasto"),
         ].join("");
 
         renderizarBarras("chartEquipamentos", data.uso.equipamentos_mais_usados, "nome", "total");
