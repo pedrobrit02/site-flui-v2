@@ -77,7 +77,14 @@ export async function handleCadastroUsuario(request, env) {
   const token = await createSessionToken({ usuarioId: id, nome, email }, env.SESSION_SECRET);
   const res = json(
     request,
-    { ok: true, usuario: usuarioPublico({ id, nome, email, matricula, curso_setor: cursoSetor, vinculo }) },
+    {
+      ok: true,
+      usuario: usuarioPublico({ id, nome, email, matricula, curso_setor: cursoSetor, vinculo }),
+      // Além do cookie, manda o token no corpo — o front-end guarda no
+      // localStorage e usa "Authorization: Bearer" pra não depender de
+      // cookie cross-site (ver comentário em auth.js).
+      token,
+    },
     201
   );
   res.headers.append("Set-Cookie", userSessionCookieHeader(token));
@@ -105,7 +112,7 @@ export async function handleLoginUsuario(request, env) {
     { usuarioId: usuario.id, nome: usuario.nome, email: usuario.email },
     env.SESSION_SECRET
   );
-  const res = json(request, { ok: true, usuario: usuarioPublico(usuario) });
+  const res = json(request, { ok: true, usuario: usuarioPublico(usuario), token });
   res.headers.append("Set-Cookie", userSessionCookieHeader(token));
   return res;
 }

@@ -231,7 +231,30 @@
       }
 
       const WORKER_URL = "https://flui-api.pedro-brito-flui.workers.dev";
-      const fetchOpts = (opts = {}) => ({ credentials: "include", ...opts });
+
+      // Ver comentário igual em login.html: o cookie de sessão pode ser
+      // bloqueado como "de terceiro" entre pedrobrit02.github.io e
+      // flui-api.pedro-brito-flui.workers.dev, então a sessão do admin
+      // também viaja como token no localStorage + header Authorization.
+      const TOKEN_KEY_ADMIN = "flui_admin_token";
+      function getAdminToken() {
+        try {
+          return localStorage.getItem(TOKEN_KEY_ADMIN);
+        } catch (e) {
+          return null;
+        }
+      }
+      function clearAdminToken() {
+        try {
+          localStorage.removeItem(TOKEN_KEY_ADMIN);
+        } catch (e) {}
+      }
+      const fetchOpts = (opts = {}) => {
+        const token = getAdminToken();
+        const headers = { ...(opts.headers || {}) };
+        if (token) headers.Authorization = `Bearer ${token}`;
+        return { credentials: "include", ...opts, headers };
+      };
 
       // --- Autenticação ---
       async function checarSessao() {
@@ -247,6 +270,7 @@
 
       document.getElementById("btnSair").addEventListener("click", async () => {
         await fetch(`${WORKER_URL}/api/admin/logout`, fetchOpts({ method: "POST" }));
+        clearAdminToken();
         window.location.href = "./login.html";
       });
 

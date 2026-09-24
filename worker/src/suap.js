@@ -25,8 +25,8 @@ import { createSessionToken, userSessionCookieHeader, hashPassword } from "./aut
 
 const SUAP_BASE = "https://suap.ifmg.edu.br";
 const REDIRECT_URI = "https://flui-api.pedro-brito-flui.workers.dev/api/auth/suap/callback";
-const FRONTEND_APOS_LOGIN = "https://pedrobrit02.github.io/Flui/biblioteca.html";
-const FRONTEND_LOGIN = "https://pedrobrit02.github.io/Flui/login.html";
+const FRONTEND_APOS_LOGIN = "https://pedrobrit02.github.io/site-flui-v2/biblioteca.html";
+const FRONTEND_LOGIN = "https://pedrobrit02.github.io/site-flui-v2/login.html";
 const STATE_COOKIE = "flui_suap_state";
 
 function redirect(location) {
@@ -192,7 +192,10 @@ export async function handleSuapCallback(request, env) {
     { usuarioId: usuario.id, nome: usuario.nome, email: usuario.email },
     env.SESSION_SECRET
   );
-  const res = redirect(FRONTEND_APOS_LOGIN);
+  // Ver comentário equivalente em oauth.js: o token também vai no
+  // fragmento da URL pra funcionar mesmo quando o navegador bloqueia o
+  // cookie cross-site.
+  const res = redirect(`${FRONTEND_APOS_LOGIN}#token=${encodeURIComponent(token)}`);
   res.headers.append("Set-Cookie", userSessionCookieHeader(token));
   res.headers.append("Set-Cookie", clearStateCookieHeader());
   return res;

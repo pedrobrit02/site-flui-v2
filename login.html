@@ -173,6 +173,50 @@
       // "?erro=google_nao_configurado" em vez de dar erro feio do Google.
       const WORKER_URL = "https://flui-api.pedro-brito-flui.workers.dev";
 
+      // Vários navegadores (Brave, Safari, Firefox estrito, e cada vez mais
+      // o Chrome) bloqueiam por padrão o cookie de sessão entre
+      // pedrobrit02.github.io e flui-api.pedro-brito-flui.workers.dev,
+      // porque são origens diferentes ("cookie de terceiro"). Por isso a
+      // sessão também é guardada aqui no localStorage e mandada em todo
+      // fetch como "Authorization: Bearer <token>" — isso não depende de
+      // cookie nenhum.
+      const TOKEN_KEY_ADMIN = "flui_admin_token";
+      const TOKEN_KEY_USER = "flui_user_token";
+
+      function getToken(key) {
+        try {
+          return localStorage.getItem(key);
+        } catch (e) {
+          return null;
+        }
+      }
+      function setToken(key, value) {
+        try {
+          if (value) localStorage.setItem(key, value);
+        } catch (e) {
+          /* sem localStorage (modo privado, etc.) — segue só com o cookie */
+        }
+      }
+      function authHeaders(key, extra = {}) {
+        const token = getToken(key);
+        return token ? { ...extra, Authorization: `Bearer ${token}` } : extra;
+      }
+
+      // Se voltou do login com Google com o token no fragmento da URL
+      // (#token=...), guarda no localStorage e já manda pra Biblioteca —
+      // o fragmento nunca vai pro servidor, então isso fica só no navegador.
+      let voltouDoOauthComToken = false;
+      if (window.location.hash.indexOf("token=") !== -1) {
+        const params = new URLSearchParams(window.location.hash.slice(1));
+        const tokenDoHash = params.get("token");
+        if (tokenDoHash) {
+          setToken(TOKEN_KEY_USER, tokenDoHash);
+          history.replaceState(null, "", window.location.pathname + window.location.search);
+          voltouDoOauthComToken = true;
+          window.location.href = "./biblioteca.html";
+        }
+      }
+
       // --- Alternar entre a tela de login e a de cadastro ---
       const cardLogin = document.getElementById("cardLogin");
       const cardCadastro = document.getElementById("cardCadastro");
@@ -217,25 +261,33 @@
       }
 
       // Se já tiver sessão válida (admin ou usuário), pula direto.
-      (async () => {
-        try {
-          const resAdmin = await fetch(`${WORKER_URL}/api/admin/me`, { credentials: "include" });
-          if (resAdmin.ok) {
-            window.location.href = "./admin.html";
-            return;
+      if (!voltouDoOauthComToken) {
+        (async () => {
+          try {
+            const resAdmin = await fetch(`${WORKER_URL}/api/admin/me`, {
+              credentials: "include",
+              headers: authHeaders(TOKEN_KEY_ADMIN),
+            });
+            if (resAdmin.ok) {
+              window.location.href = "./admin.html";
+              return;
+            }
+          } catch (e) {
+            /* segue */
           }
-        } catch (e) {
-          /* segue */
-        }
-        try {
-          const resUsuario = await fetch(`${WORKER_URL}/api/usuarios/me`, { credentials: "include" });
-          if (resUsuario.ok) {
-            window.location.href = "./biblioteca.html";
+          try {
+            const resUsuario = await fetch(`${WORKER_URL}/api/usuarios/me`, {
+              credentials: "include",
+              headers: authHeaders(TOKEN_KEY_USER),
+            });
+            if (resUsuario.ok) {
+              window.location.href = "./biblioteca.html";
+            }
+          } catch (e) {
+            /* segue para o login normalmente */
           }
-        } catch (e) {
-          /* segue para o login normalmente */
-        }
-      })();
+        })();
+      }
 
       loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -254,6 +306,8 @@
             body: JSON.stringify({ email, password }),
           });
           if (resAdmin.ok) {
+            const dataAdmin = await resAdmin.json().catch(() => ({}));
+            setToken(TOKEN_KEY_ADMIN, dataAdmin.token);
             window.location.href = "./admin.html";
             return;
           }
@@ -269,6 +323,7 @@
             mostrarErro(dataUsuario.error || "E-mail ou senha inválidos.");
             return;
           }
+          setToken(TOKEN_KEY_USER, dataUsuario.token);
           window.location.href = "./biblioteca.html";
         } catch (err) {
           mostrarErro("Erro de conexão. Tente novamente.");
@@ -335,6 +390,7 @@
             mostrarErroCadastro(data.error || "Não foi possível criar a conta.");
             return;
           }
+          setToken(TOKEN_KEY_USER, data.token);
           window.location.href = "./biblioteca.html";
         } catch (err) {
           mostrarErroCadastro("Erro de conexão. Tente novamente.");

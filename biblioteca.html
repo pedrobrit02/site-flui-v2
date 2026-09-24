@@ -83,9 +83,47 @@
       const WORKER_URL = "https://flui-api.pedro-brito-flui.workers.dev";
       const saudacao = document.getElementById("biblioSaudacao");
 
+      // Ver comentário igual em login.html: o cookie de sessão pode ser
+      // bloqueado como "de terceiro" entre pedrobrit02.github.io e
+      // flui-api.pedro-brito-flui.workers.dev, então a sessão também viaja
+      // como token no localStorage + header Authorization.
+      const TOKEN_KEY_USER = "flui_user_token";
+      function getToken(key) {
+        try {
+          return localStorage.getItem(key);
+        } catch (e) {
+          return null;
+        }
+      }
+      function clearToken(key) {
+        try {
+          localStorage.removeItem(key);
+        } catch (e) {}
+      }
+      function authHeaders(key, extra = {}) {
+        const token = getToken(key);
+        return token ? { ...extra, Authorization: `Bearer ${token}` } : extra;
+      }
+
+      // Se chegou aqui direto do login do Google com o token ainda no
+      // fragmento da URL (#token=...), guarda antes de checar a sessão.
+      if (window.location.hash.indexOf("token=") !== -1) {
+        const params = new URLSearchParams(window.location.hash.slice(1));
+        const tokenDoHash = params.get("token");
+        if (tokenDoHash) {
+          try {
+            localStorage.setItem(TOKEN_KEY_USER, tokenDoHash);
+          } catch (e) {}
+          history.replaceState(null, "", window.location.pathname + window.location.search);
+        }
+      }
+
       (async () => {
         try {
-          const res = await fetch(`${WORKER_URL}/api/usuarios/me`, { credentials: "include" });
+          const res = await fetch(`${WORKER_URL}/api/usuarios/me`, {
+            credentials: "include",
+            headers: authHeaders(TOKEN_KEY_USER),
+          });
           if (!res.ok) {
             window.location.href = "./login.html";
             return;
@@ -98,7 +136,12 @@
       })();
 
       document.getElementById("btnSairBiblioteca").addEventListener("click", async () => {
-        await fetch(`${WORKER_URL}/api/usuarios/logout`, { method: "POST", credentials: "include" });
+        await fetch(`${WORKER_URL}/api/usuarios/logout`, {
+          method: "POST",
+          credentials: "include",
+          headers: authHeaders(TOKEN_KEY_USER),
+        });
+        clearToken(TOKEN_KEY_USER);
         window.location.href = "./login.html";
       });
     </script>

@@ -47,7 +47,14 @@ export async function handleLogin(request, env) {
     env.SESSION_SECRET
   );
 
-  const res = json(request, { ok: true, admin: { id: admin.id, name: admin.name, email: admin.email } });
+  const res = json(request, {
+    ok: true,
+    admin: { id: admin.id, name: admin.name, email: admin.email },
+    // Vai também no corpo (não só no cookie) — front-end guarda no
+    // localStorage e manda como "Authorization: Bearer" pra não depender
+    // de cookie cross-site (ver comentário em auth.js).
+    token,
+  });
   res.headers.append("Set-Cookie", sessionCookieHeader(token));
   return res;
 }

@@ -19,7 +19,12 @@ export function corsHeaders(request) {
   const origin = request.headers.get("Origin");
   const headers = {
     "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    // "Authorization" precisa estar liberado aqui porque o front-end agora
+    // manda o token de sessão como "Authorization: Bearer <token>" (além do
+    // cookie) — sem isso o navegador bloqueia a requisição inteira no
+    // preflight, antes mesmo dela chegar no Worker (aparece como "erro de
+    // rede"/"Failed to fetch" no front-end, sem nenhum log no wrangler tail).
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
     "Access-Control-Allow-Credentials": "true",
   };
   // Com credentials (cookies de sessão), o header Allow-Origin não pode ser

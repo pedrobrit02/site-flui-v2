@@ -43,8 +43,8 @@
 
 import { createSessionToken, userSessionCookieHeader, hashPassword } from "./auth.js";
 
-const FRONTEND_APOS_LOGIN = "https://pedrobrit02.github.io/Flui/biblioteca.html";
-const FRONTEND_LOGIN = "https://pedrobrit02.github.io/Flui/login.html";
+const FRONTEND_APOS_LOGIN = "https://pedrobrit02.github.io/site-flui-v2/biblioteca.html";
+const FRONTEND_LOGIN = "https://pedrobrit02.github.io/site-flui-v2/login.html";
 const STATE_COOKIE = "flui_oauth_state";
 
 const PROVIDERS = {
@@ -177,6 +177,9 @@ export async function handleOauthLogin(request, env, providerName) {
 
   const res = redirect(authorizeUrl.toString());
   res.headers.append("Set-Cookie", stateCookieHeader(`${providerName}:${state}`));
+  console.log(
+    `[oauth:${providerName}] login iniciado — redirecionando pro provedor, Set-Cookie=${stateCookieHeader(`${providerName}:${state}`)}`
+  );
   return res;
 }
 
@@ -187,7 +190,14 @@ export async function handleOauthCallback(request, env, providerName) {
   const state = url.searchParams.get("state");
   const savedState = getCookie(request, STATE_COOKIE);
 
+  console.log(
+    `[oauth:${providerName}] callback recebido — code=${code ? "presente" : "ausente"}, ` +
+      `state(param)=${state || "ausente"}, cookie recebido=${request.headers.get("Cookie") || "(nenhum cookie enviado)"}, ` +
+      `savedState=${savedState || "ausente"}, esperado=${providerName}:${state}`
+  );
+
   if (!code || !state || !savedState || savedState !== `${providerName}:${state}`) {
+    console.log(`[oauth:${providerName}] falhou na checagem de state — abortando com erro oauth_state`);
     const res = redirect(`${FRONTEND_LOGIN}?erro=oauth_state`);
     res.headers.append("Set-Cookie", clearStateCookieHeader());
     return res;
@@ -209,11 +219,15 @@ export async function handleOauthCallback(request, env, providerName) {
         client_secret: env[provider.clientSecretKey],
       }),
     });
-    if (!tokenRes.ok) throw new Error(`token http ${tokenRes.status}`);
+    if (!tokenRes.ok) {
+      const corpo = await tokenRes.text().catch(() => "(sem corpo)");
+      throw new Error(`token http ${tokenRes.status}: ${corpo}`);
+    }
     const tokenData = await tokenRes.json();
     accessToken = tokenData.access_token;
-    if (!accessToken) throw new Error("sem access_token na resposta");
+    if (!accessToken) throw new Error(`sem access_token na resposta: ${JSON.stringify(tokenData)}`);
   } catch (err) {
+    console.log(`[oauth:${providerName}] FALHOU na troca do code pelo token — ${err.message}`);
     const res = redirect(`${FRONTEND_LOGIN}?erro=${providerName}_token`);
     res.headers.append("Set-Cookie", clearStateCookieHeader());
     return res;
@@ -222,8 +236,9 @@ export async function handleOauthCallback(request, env, providerName) {
   let perfil;
   try {
     perfil = await provider.fetchPerfil(accessToken);
-    if (!perfil.id) throw new Error("perfil sem id");
+    if (!perfil.id) throw new Error(`perfil sem id: ${JSON.stringify(perfil)}`);
   } catch (err) {
+    console.log(`[oauth:${providerName}] FALHOU ao buscar o perfil — ${err.message}`);
     const res = redirect(`${FRONTEND_LOGIN}?erro=${providerName}_perfil`);
     res.headers.append("Set-Cookie", clearStateCookieHeader());
     return res;
@@ -232,64 +247,86 @@ export async function handleOauthCallback(request, env, providerName) {
   const oauthId = String(perfil.id);
   const nome = String(perfil.nome || "Usuário").trim();
   const email = String(perfil.email || "").trim().toLowerCase();
+  console.log(`[oauth:${providerName}] perfil obtido com sucesso — id=${oauthId}, nome=${nome}, email=${email || "(sem email)"}`);
 
-  let usuario = await env.DB.prepare(
-    "SELECT * FROM usuarios WHERE oauth_provider = ? AND oauth_id = ?"
-  )
-    .bind(providerName, oauthId)
-    .first();
-
-  if (usuario) {
-    await env.DB.prepare(
-      "UPDATE usuarios SET nome = ?, email = COALESCE(NULLIF(?, ''), email) WHERE id = ?"
+  let usuario;
+  try {
+    usuario = await env.DB.prepare(
+      "SELECT * FROM usuarios WHERE oauth_provider = ? AND oauth_id = ?"
     )
-      .bind(nome, email, usuario.id)
-      .run();
-    usuario = { ...usuario, nome, email: email || usuario.email };
-  } else {
-    // E-mail é UNIQUE na tabela — se já existir uma conta (manual, SUAP ou
-    // de outro provedor) com esse mesmo e-mail, só vincula esse provedor a
-    // ela em vez de criar uma linha duplicada.
-    const porEmail = email
-      ? await env.DB.prepare("SELECT * FROM usuarios WHERE email = ?").bind(email).first()
-      : null;
+      .bind(providerName, oauthId)
+      .first();
 
-    if (porEmail) {
+    if (usuario) {
       await env.DB.prepare(
-        "UPDATE usuarios SET oauth_provider = COALESCE(oauth_provider, ?), oauth_id = COALESCE(oauth_id, ?), nome = ? WHERE id = ?"
+        "UPDATE usuarios SET nome = ?, email = COALESCE(NULLIF(?, ''), email) WHERE id = ?"
       )
-        .bind(providerName, oauthId, nome, porEmail.id)
+        .bind(nome, email, usuario.id)
         .run();
-      usuario = { ...porEmail, nome };
+      usuario = { ...usuario, nome, email: email || usuario.email };
     } else {
-      if (!email) {
-        // Sem e-mail nenhum (ex: GitHub com e-mail 100% privado) não dá pra
-        // criar conta — a tabela exige e-mail único e é por ele que a
-        // Biblioteca identifica a pessoa.
-        const res = redirect(`${FRONTEND_LOGIN}?erro=${providerName}_sem_email`);
-        res.headers.append("Set-Cookie", clearStateCookieHeader());
-        return res;
+      // E-mail é UNIQUE na tabela — se já existir uma conta (manual, SUAP ou
+      // de outro provedor) com esse mesmo e-mail, só vincula esse provedor a
+      // ela em vez de criar uma linha duplicada.
+      const porEmail = email
+        ? await env.DB.prepare("SELECT * FROM usuarios WHERE email = ?").bind(email).first()
+        : null;
+
+      if (porEmail) {
+        await env.DB.prepare(
+          "UPDATE usuarios SET oauth_provider = COALESCE(oauth_provider, ?), oauth_id = COALESCE(oauth_id, ?), nome = ? WHERE id = ?"
+        )
+          .bind(providerName, oauthId, nome, porEmail.id)
+          .run();
+        usuario = { ...porEmail, nome };
+      } else {
+        if (!email) {
+          // Sem e-mail nenhum (ex: GitHub com e-mail 100% privado) não dá pra
+          // criar conta — a tabela exige e-mail único e é por ele que a
+          // Biblioteca identifica a pessoa.
+          const res = redirect(`${FRONTEND_LOGIN}?erro=${providerName}_sem_email`);
+          res.headers.append("Set-Cookie", clearStateCookieHeader());
+          return res;
+        }
+        const id = crypto.randomUUID();
+        // Contas criadas via OAuth não têm senha própria — gera um hash
+        // aleatório inutilizável só pra respeitar a coluna NOT NULL de
+        // password_hash sem precisar mudar o schema.
+        const senhaInutilizavel = await hashPassword(crypto.randomUUID() + crypto.randomUUID());
+        await env.DB.prepare(
+          `INSERT INTO usuarios (id, nome, email, password_hash, vinculo, oauth_provider, oauth_id)
+           VALUES (?, ?, ?, ?, 'externo', ?, ?)`
+        )
+          .bind(id, nome, email, senhaInutilizavel, providerName, oauthId)
+          .run();
+        usuario = { id, nome, email };
       }
-      const id = crypto.randomUUID();
-      // Contas criadas via OAuth não têm senha própria — gera um hash
-      // aleatório inutilizável só pra respeitar a coluna NOT NULL de
-      // password_hash sem precisar mudar o schema.
-      const senhaInutilizavel = await hashPassword(crypto.randomUUID() + crypto.randomUUID());
-      await env.DB.prepare(
-        `INSERT INTO usuarios (id, nome, email, password_hash, vinculo, oauth_provider, oauth_id)
-         VALUES (?, ?, ?, ?, 'externo', ?, ?)`
-      )
-        .bind(id, nome, email, senhaInutilizavel, providerName, oauthId)
-        .run();
-      usuario = { id, nome, email };
     }
+  } catch (err) {
+    console.log(`[oauth:${providerName}] FALHOU no banco de dados (usuarios) — ${err.message}`);
+    const res = redirect(`${FRONTEND_LOGIN}?erro=${providerName}_conta`);
+    res.headers.append("Set-Cookie", clearStateCookieHeader());
+    return res;
   }
 
   const token = await createSessionToken(
     { usuarioId: usuario.id, nome: usuario.nome, email: usuario.email },
     env.SESSION_SECRET
   );
-  const res = redirect(FRONTEND_APOS_LOGIN);
+  // O cookie de sessão é setado normalmente (funciona em mesma origem/
+  // localhost), mas como o painel (GitHub Pages) e a API (workers.dev) são
+  // origens diferentes, vários navegadores bloqueiam esse cookie por
+  // padrão como "de terceiro" — mesmo com SameSite=None. Por isso o token
+  // também vai no fragmento da URL (#token=...): o front-end lê isso em
+  // login.html, guarda no localStorage e passa a mandar
+  // "Authorization: Bearer <token>" nas próximas chamadas, sem depender de
+  // cookie nenhum. O fragmento nunca é enviado ao servidor (fica só no
+  // navegador), então isso não aparece em nenhum log.
+  const destino = `${FRONTEND_APOS_LOGIN}#token=${encodeURIComponent(token)}`;
+  console.log(
+    `[oauth:${providerName}] sucesso — usuarioId=${usuario.id}, redirecionando pra ${FRONTEND_APOS_LOGIN} (com token no fragmento) e novo flui_user_session`
+  );
+  const res = redirect(destino);
   res.headers.append("Set-Cookie", userSessionCookieHeader(token));
   res.headers.append("Set-Cookie", clearStateCookieHeader());
   return res;

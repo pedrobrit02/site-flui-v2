@@ -169,12 +169,31 @@ export function clearUserSessionCookieHeader() {
   return clearCookieHeader(USER_SESSION_COOKIE);
 }
 
+// Alguns navegadores (Brave, Safari, Firefox em modo estrito, e cada vez
+// mais o Chrome) bloqueiam por padrão o cookie de sessão porque, do ponto
+// de vista do navegador, o painel (pedrobrit02.github.io) e a API
+// (flui-api.pedro-brito-flui.workers.dev) são sites diferentes — é um
+// cookie "de terceiro" nessa requisição, mesmo com SameSite=None. Por isso
+// o token também pode chegar num header "Authorization: Bearer <token>",
+// guardado pelo front-end no localStorage — esse caminho não depende de
+// cookie nenhum. O cookie continua sendo setado e aceito (funciona normal
+// em localhost/mesma origem), mas o header, quando presente, tem prioridade.
+function getBearerToken(request) {
+  const header = request.headers.get("Authorization") || "";
+  const match = header.match(/^Bearer\s+(.+)$/i);
+  return match ? match[1].trim() : null;
+}
+
 export function getSessionTokenFromRequest(request) {
+  const bearer = getBearerToken(request);
+  if (bearer) return bearer;
   const cookies = parseCookies(request);
   return cookies[SESSION_COOKIE] || null;
 }
 
 export function getUserSessionTokenFromRequest(request) {
+  const bearer = getBearerToken(request);
+  if (bearer) return bearer;
   const cookies = parseCookies(request);
   return cookies[USER_SESSION_COOKIE] || null;
 }
