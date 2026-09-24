@@ -133,37 +133,25 @@
             </a>
           </p>
 
-          <div class="instagram-embeds">
-            <blockquote
-              class="instagram-media"
-              data-instgrm-permalink="https://www.instagram.com/p/DdKGbs6iZzJ/"
-              data-instgrm-version="14"
-              style="background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin:1px auto; max-width:540px; min-width:280px; padding:0; width:calc(100% - 2px);"
-            >
-              <div style="padding:16px;">
-                <a
-                  href="https://www.instagram.com/p/DdKGbs6iZzJ/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style="display:block; background:#FFFFFF; text-align:center; text-decoration:none;"
-                >Ver publicação de 11/09 no Instagram</a>
-              </div>
-            </blockquote>
-            <blockquote
-              class="instagram-media"
-              data-instgrm-permalink="https://www.instagram.com/p/DcwMGvHCRti/"
-              data-instgrm-version="14"
-              style="background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin:1px auto; max-width:540px; min-width:280px; padding:0; width:calc(100% - 2px);"
-            >
-              <div style="padding:16px;">
-                <a
-                  href="https://www.instagram.com/p/DcwMGvHCRti/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style="display:block; background:#FFFFFF; text-align:center; text-decoration:none;"
-                >Ver publicação de 01/09 no Instagram</a>
-              </div>
-            </blockquote>
+          <div class="news-ticker" aria-label="Últimas publicações do Instagram do FLUI">
+            <div class="news-ticker__track">
+              <a class="news-ticker__item" href="https://www.instagram.com/flui.ibirite/p/DcwMGvHCRti/" target="_blank" rel="noopener noreferrer">
+                <span class="news-ticker__date">01/09</span>
+                <span class="news-ticker__text">Estamos na sala 407 e agora também no T07! Venha inovar conosco 💡</span>
+              </a>
+              <a class="news-ticker__item" href="https://www.instagram.com/flui.ibirite/p/DdKGbs6iZzJ/" target="_blank" rel="noopener noreferrer">
+                <span class="news-ticker__date">11/09</span>
+                <span class="news-ticker__text">Nova publicação em parceria com o IFMG Campus Ibirité — confira no Instagram</span>
+              </a>
+              <a class="news-ticker__item" href="https://www.instagram.com/flui.ibirite/p/DcwMGvHCRti/" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1">
+                <span class="news-ticker__date">01/09</span>
+                <span class="news-ticker__text">Estamos na sala 407 e agora também no T07! Venha inovar conosco 💡</span>
+              </a>
+              <a class="news-ticker__item" href="https://www.instagram.com/flui.ibirite/p/DdKGbs6iZzJ/" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1">
+                <span class="news-ticker__date">11/09</span>
+                <span class="news-ticker__text">Nova publicação em parceria com o IFMG Campus Ibirité — confira no Instagram</span>
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -399,10 +387,5 @@
         body: JSON.stringify({ path: "index" }),
       }).catch(() => {});
     </script>
-
-    <!-- Embed oficial do Instagram (embed.js) — renderiza os blockquotes
-         .instagram-media acima como os posts reais, com foto e legenda,
-         direto do Instagram. Não precisa de API key nem login. -->
-    <script async src="https://www.instagram.com/embed.js"></script>
   </body>
 </html>
