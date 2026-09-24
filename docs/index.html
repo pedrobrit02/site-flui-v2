@@ -54,7 +54,7 @@
           <div class="nav__menu" id="nav-menu">
             <a class="nav__link" href="#o-que-e">O que é</a>
             <a class="nav__link" href="#o-que-oferecemos">O que oferecemos</a>
-            <a class="nav__link" href="#Utilizar-equipamentos">Utilizar os equipamentos</a>
+            <a class="nav__link" href="#Utilizar-equipamentos">Equipamentos</a>
             <a class="nav__link" href="#projetos-e-acoes">Ações</a>
             <a class="nav__link" href="#eventos">Eventos</a>
             <a class="nav__link" href="#documentacao-flui">Documentos</a>
@@ -117,7 +117,54 @@
             <h2>Projetos e Ações Atuais</h2>
             <p>Acompanhe aqui as oficinas, editais, hackathons e eventos em andamento no ecossistema do FLUI.</p>
           </div>
-          <p class="empty-state" style="padding: 8px 0 0;">Nenhuma ação cadastrada no momento — em breve, novidades por aqui.</p>
+          <p class="section__actions" style="margin-top: 16px;">
+            <a
+              class="btn btn--instagram"
+              href="https://www.instagram.com/flui.ibirite/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
+              Siga o FLUI no Instagram
+            </a>
+          </p>
+
+          <div class="instagram-embeds">
+            <blockquote
+              class="instagram-media"
+              data-instgrm-permalink="https://www.instagram.com/p/DdKGbs6iZzJ/"
+              data-instgrm-version="14"
+              style="background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin:1px auto; max-width:540px; min-width:280px; padding:0; width:calc(100% - 2px);"
+            >
+              <div style="padding:16px;">
+                <a
+                  href="https://www.instagram.com/p/DdKGbs6iZzJ/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style="display:block; background:#FFFFFF; text-align:center; text-decoration:none;"
+                >Ver publicação de 11/09 no Instagram</a>
+              </div>
+            </blockquote>
+            <blockquote
+              class="instagram-media"
+              data-instgrm-permalink="https://www.instagram.com/p/DcwMGvHCRti/"
+              data-instgrm-version="14"
+              style="background:#FFF; border:0; border-radius:3px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin:1px auto; max-width:540px; min-width:280px; padding:0; width:calc(100% - 2px);"
+            >
+              <div style="padding:16px;">
+                <a
+                  href="https://www.instagram.com/p/DcwMGvHCRti/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style="display:block; background:#FFFFFF; text-align:center; text-decoration:none;"
+                >Ver publicação de 01/09 no Instagram</a>
+              </div>
+            </blockquote>
+          </div>
         </div>
       </section>
 
@@ -352,5 +399,10 @@
         body: JSON.stringify({ path: "index" }),
       }).catch(() => {});
     </script>
+
+    <!-- Embed oficial do Instagram (embed.js) — renderiza os blockquotes
+         .instagram-media acima como os posts reais, com foto e legenda,
+         direto do Instagram. Não precisa de API key nem login. -->
+    <script async src="https://www.instagram.com/embed.js"></script>
   </body>
 </html>
