@@ -13,7 +13,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="Style.css?v=3" />
-    <link rel="stylesheet" href="admin.css?v=3" />
+    <link rel="stylesheet" href="admin.css?v=4" />
   </head>
   <body>
     <header class="site-header" id="topo">
@@ -33,6 +33,7 @@
             <a class="nav__link" href="./index.html#o-que-e">O que é</a>
             <a class="nav__link" href="./index.html#o-que-oferecemos">O que oferecemos</a>
             <a class="nav__link" href="./index.html#Utilizar-equipamentos">Equipamentos</a>
+            <a class="nav__link" href="./index.html#projetos-e-acoes">Ações</a>
             <a class="nav__link" href="./index.html#eventos">Eventos</a>
             <a class="nav__link" href="./index.html#documentacao-flui">Documentos</a>
             <a class="nav__link" href="./index.html#docentes">Docentes</a>
@@ -55,6 +56,16 @@
           </div>
           <h1>Entrar</h1>
         </div>
+
+        <div class="oauth-stack">
+          <a class="btn-oauth btn-oauth--suap" href="https://flui-api.pedro-brito-flui.workers.dev/api/auth/suap/login" data-provider="SUAP">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5Z"/><path d="M6 12v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/></svg>
+            Entrar com SUAP
+          </a>
+        </div>
+        <p class="oauth-stack__hint">Recomendado para alunos e servidores do IFMG</p>
+
+        <div class="divider">outras opções</div>
 
         <div class="oauth-stack">
           <a class="btn-oauth" href="https://bibliotecaflui.pythonanywhere.com/accounts/google/login/" data-provider="Google">
@@ -193,7 +204,9 @@
       // rodam no banco D1 do Worker, que já está no ar.
       const BIBLIOTECA_PRONTA = false;
 
-      document.querySelectorAll(".btn-oauth").forEach((link) => {
+      // O botão do SUAP é real e já funciona (roda no Worker, não depende do
+      // Django) — só os de Google/Microsoft/GitHub ficam atrás do aviso.
+      document.querySelectorAll(".btn-oauth:not(.btn-oauth--suap)").forEach((link) => {
         link.addEventListener("click", (e) => {
           if (!BIBLIOTECA_PRONTA) {
             e.preventDefault();
@@ -229,6 +242,19 @@
       function mostrarErro(texto) {
         msg.textContent = texto;
         msg.style.display = "block";
+      }
+
+      // Se o SUAP redirecionou de volta com erro (ex: sessão expirada antes
+      // de terminar o login), mostra o motivo aqui em vez de silenciosamente
+      // cair na tela de login sem explicação.
+      const ERROS_SUAP = {
+        suap_state: "A sessão de login com o SUAP expirou. Tente novamente.",
+        suap_token: "Não foi possível confirmar o login com o SUAP. Tente novamente.",
+        suap_perfil: "Não foi possível obter seus dados do SUAP. Tente novamente ou entre com e-mail e senha.",
+      };
+      const erroSuap = new URLSearchParams(window.location.search).get("erro");
+      if (erroSuap && ERROS_SUAP[erroSuap]) {
+        mostrarErro(ERROS_SUAP[erroSuap]);
       }
 
       // Se já tiver sessão válida (admin ou usuário), pula direto.

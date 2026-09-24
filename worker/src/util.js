@@ -1,5 +1,20 @@
 // Utilidades compartilhadas entre os módulos do Worker.
 
+// Origens que podem fazer requisições AUTENTICADAS (com cookie de sessão) —
+// só o site publicado e o ambiente local de desenvolvimento (`npm run dev`,
+// Vite). Antes isso refletia QUALQUER Origin enviado pelo navegador, o que,
+// combinado com cookies SameSite=None, permitia que um site malicioso
+// fizesse requisições autenticadas em nome de um admin/usuário logado
+// (CSRF) — o navegador só bloqueia a LEITURA da resposta por outra origem,
+// não o envio da requisição em si. Restringir a uma lista fixa fecha isso:
+// uma origem fora da lista simplesmente não recebe os headers de CORS
+// necessários pra a requisição autenticada ser aceita pelo navegador.
+const ORIGENS_PERMITIDAS = [
+  "https://pedrobrit02.github.io",
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+];
+
 export function corsHeaders(request) {
   const origin = request.headers.get("Origin");
   const headers = {
@@ -7,10 +22,13 @@ export function corsHeaders(request) {
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Allow-Credentials": "true",
   };
-  // Com credentials (cookies de sessão do admin), o header Allow-Origin não
-  // pode ser "*" — precisa refletir a origem exata da requisição.
-  headers["Access-Control-Allow-Origin"] = origin || "*";
-  if (origin) headers["Vary"] = "Origin";
+  // Com credentials (cookies de sessão), o header Allow-Origin não pode ser
+  // "*" — precisa ser a origem exata, e só concedemos isso pra quem está
+  // na lista acima.
+  if (origin && ORIGENS_PERMITIDAS.includes(origin)) {
+    headers["Access-Control-Allow-Origin"] = origin;
+    headers["Vary"] = "Origin";
+  }
   return headers;
 }
 

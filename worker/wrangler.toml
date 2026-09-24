@@ -16,6 +16,8 @@ binding = "UPLOADS_BUCKET"           # nome usado no código como env.UPLOADS_BU
 bucket_name = "flui-uploads"         # bucket PRIVADO (termos assinados) — sem rota pública
 
 # Secrets (não vão aqui, são configurados com "wrangler secret put"):
-#   SESSION_SECRET  — string aleatória p/ assinar o login do admin
-#   RESEND_API_KEY  — chave da API do Resend p/ enviar e-mail de decisão
-#   RESEND_FROM     — remetente do e-mail, ex: "FLUI <no-reply@seudominio.com>"
+#   SESSION_SECRET     — string aleatória p/ assinar o login do admin
+#   RESEND_API_KEY     — chave da API do Resend p/ enviar e-mail de decisão
+#   RESEND_FROM        — remetente do e-mail, ex: "FLUI <no-reply@seudominio.com>"
+#   SUAP_CLIENT_ID      — client_id da aplicação cadastrada no SUAP (login via SUAP)
+#   SUAP_CLIENT_SECRET  — client_secret da mesma aplicação

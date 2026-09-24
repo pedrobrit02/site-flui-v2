@@ -718,6 +718,21 @@ table.admin-table {
 .btn-oauth--apple:hover { background: #1a1a1a; }
 .btn-oauth--github { background: #171515; color: #fff; border-color: #171515; }
 .btn-oauth--github:hover { background: #2b2828; }
+.btn-oauth--suap {
+  background: #0a6e3d;
+  color: #fff;
+  border-color: #0a6e3d;
+  font-weight: 700;
+}
+.btn-oauth--suap:hover { background: #08582f; }
+.btn-oauth--suap svg { width: 20px; height: 20px; }
+
+.oauth-stack__hint {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-align: center;
+}
 
 .divider {
   display: flex;

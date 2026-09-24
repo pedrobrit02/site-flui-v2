@@ -105,14 +105,27 @@ export async function handleDecidir(request, env, tipo, id) {
     return json(request, { error: "status deve ser 'deferido' ou 'indeferido'" }, 400);
   }
 
+  // Consumo de materiais (opcional, só faz sentido ao deferir).
+  const filamentoKg = numeroOuNulo(body.filamento_kg);
+  const mdfMetros = numeroOuNulo(body.mdf_metros);
+  if (Number.isNaN(filamentoKg)) {
+    return json(request, { error: "filamento_kg precisa ser um número válido (>= 0)" }, 400);
+  }
+  if (Number.isNaN(mdfMetros)) {
+    return json(request, { error: "mdf_metros precisa ser um número válido (>= 0)" }, 400);
+  }
+
   const { table } = TIPOS[tipo];
   const row = await env.DB.prepare(`SELECT * FROM ${table} WHERE id = ?`).bind(id).first();
   if (!row) return json(request, { error: "Solicitação não encontrada" }, 404);
 
   await env.DB.prepare(
-    `UPDATE ${table} SET status = ?, decided_by = ?, decided_at = datetime('now') WHERE id = ?`
+    `UPDATE ${table}
+     SET status = ?, decided_by = ?, decided_at = datetime('now'),
+         filamento_kg = COALESCE(?, filamento_kg), mdf_metros = COALESCE(?, mdf_metros)
+     WHERE id = ?`
   )
-    .bind(body.status, session.adminId, id)
+    .bind(body.status, session.adminId, filamentoKg, mdfMetros, id)
     .run();
 
   const emailResult = await enviarEmailDecisao(env, {
@@ -146,6 +159,12 @@ export async function handleTermoDownload(request, env, tipo, id) {
   return new Response(object.body, { headers });
 }
 
+function numeroOuNulo(valor) {
+  if (valor === undefined || valor === null || valor === "") return null;
+  const n = Number(valor);
+  return Number.isFinite(n) && n >= 0 ? n : NaN;
+}
+
 function contarItens(rows, campo) {
   const contagem = {};
   for (const row of rows) {
@@ -165,9 +184,16 @@ export async function handleStats(request, env) {
   const session = await requireAdmin(request, env);
   if (!session) return json(request, { error: "Não autenticado" }, 401);
 
-  const [usoRows, emprestimoRows] = await Promise.all([
+  const [usoRows, emprestimoRows, consumo] = await Promise.all([
     env.DB.prepare("SELECT status, equipamentos FROM uso_solicitacoes").all(),
     env.DB.prepare("SELECT status, materiais FROM emprestimo_solicitacoes").all(),
+    env.DB.prepare(
+      `SELECT
+         (SELECT COALESCE(SUM(filamento_kg), 0) FROM uso_solicitacoes) +
+         (SELECT COALESCE(SUM(filamento_kg), 0) FROM emprestimo_solicitacoes) AS filamento_kg,
+         (SELECT COALESCE(SUM(mdf_metros), 0) FROM uso_solicitacoes) +
+         (SELECT COALESCE(SUM(mdf_metros), 0) FROM emprestimo_solicitacoes) AS mdf_metros`
+    ).first(),
   ]);
 
   const contarStatus = (rows) => {
@@ -186,6 +212,10 @@ export async function handleStats(request, env) {
       total: emprestimoRows.results.length,
       por_status: contarStatus(emprestimoRows.results),
       materiais_mais_emprestados: contarItens(emprestimoRows.results, "materiais"),
+    },
+    materiais_consumidos: {
+      filamento_kg: consumo?.filamento_kg || 0,
+      mdf_metros: consumo?.mdf_metros || 0,
     },
   });
 }
@@ -241,6 +271,8 @@ export async function handleExportCsv(request, env, url) {
     },
     { label: "Finalidade", get: (r) => r.finalidade },
     { label: "Observações", get: (r) => r.observacoes },
+    { label: "Filamento (kg)", get: (r) => r.filamento_kg ?? "" },
+    { label: "MDF (m)", get: (r) => r.mdf_metros ?? "" },
     { label: "Status", get: (r) => r.status },
     { label: "Decidido em", get: (r) => r.decided_at },
     { label: "Criado em", get: (r) => r.created_at },

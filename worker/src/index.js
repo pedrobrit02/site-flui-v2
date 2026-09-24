@@ -29,6 +29,7 @@ import {
   handleLogoutUsuario,
   handleMeUsuario,
 } from "./usuarios.js";
+import { handleSuapLogin, handleSuapCallback } from "./suap.js";
 
 export default {
   async fetch(request, env) {
@@ -133,6 +134,12 @@ export default {
       if (path === "/api/usuarios/login" && request.method === "POST") return handleLoginUsuario(request, env);
       if (path === "/api/usuarios/logout" && request.method === "POST") return handleLogoutUsuario(request);
       if (path === "/api/usuarios/me" && request.method === "GET") return handleMeUsuario(request, env);
+
+      // --- Login via SUAP (OAuth2) ---
+      if (path === "/api/auth/suap/login" && request.method === "GET") return handleSuapLogin(request, env);
+      if (path === "/api/auth/suap/callback" && request.method === "GET") {
+        return handleSuapCallback(request, env);
+      }
 
       // --- Admins (gestão de contas) ---
       if (path === "/api/admin/admins" && request.method === "GET") return handleListAdmins(request, env);
