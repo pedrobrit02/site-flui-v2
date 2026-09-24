@@ -30,6 +30,7 @@ import {
   handleMeUsuario,
 } from "./usuarios.js";
 import { handleSuapLogin, handleSuapCallback } from "./suap.js";
+import { handleOauthLogin, handleOauthCallback } from "./oauth.js";
 
 export default {
   async fetch(request, env) {
@@ -139,6 +140,16 @@ export default {
       if (path === "/api/auth/suap/login" && request.method === "GET") return handleSuapLogin(request, env);
       if (path === "/api/auth/suap/callback" && request.method === "GET") {
         return handleSuapCallback(request, env);
+      }
+
+      // --- Login via Google / Microsoft / GitHub (OAuth2) ---
+      const oauthLoginMatch = path.match(/^\/api\/auth\/(google|microsoft|github)\/login$/);
+      if (oauthLoginMatch && request.method === "GET") {
+        return handleOauthLogin(request, env, oauthLoginMatch[1]);
+      }
+      const oauthCallbackMatch = path.match(/^\/api\/auth\/(google|microsoft|github)\/callback$/);
+      if (oauthCallbackMatch && request.method === "GET") {
+        return handleOauthCallback(request, env, oauthCallbackMatch[1]);
       }
 
       // --- Admins (gestão de contas) ---
